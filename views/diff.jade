@@ -1,0 +1,10 @@
+doctype 
+html
+head    
+    title #{title}
+    link(rel='stylesheet', type='text/css', href='/css/diff.css')
+  body
+    each diff in diffs
+      h3 revision: #{diff.revision}
+        div!=diff.diff
+        hr
