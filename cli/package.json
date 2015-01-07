@@ -1,0 +1,19 @@
+{
+  "name": "shragga",
+  "version": "6.6.6",
+  "description": "I am Sivan's evil brother, lurking in the dark shell",
+  "main": "shragga",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "directories": {
+    "bin": "./bin"
+  },
+  "preferGlobal": "true",
+  "author": "Erez Mazor",
+  "license": "BSD",
+  "dependencies": {
+    "commander": "*",
+    "optimist": "~0.3.5"
+  }
+}

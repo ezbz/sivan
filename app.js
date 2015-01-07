@@ -17,6 +17,9 @@ var io = require('socket.io');
 var stylus = require('stylus');
 var nib = require('nib');
 var appConfig = require('./config');
+var subversion = require('./routes/subversion');
+var diff = require('./routes/diff');
+var indexer = require('./routes/indexer');
 var revisions = require('./routes/revisions');
 var maven = require('./routes/maven');
 var index = require('./routes/index');
@@ -25,7 +28,6 @@ var app = express();
 
 process.env.TZ = appConfig.time.defaultTimezone;
 
-// all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -36,11 +38,7 @@ app.use(bodyParser.json());
 app.use(favicon(__dirname + '/favicon.ico'));
 app.use(morgan("combined"));
 app.use(compression());
-// app.use(express.urlencoded())
-// app.use(express.json())
 app.use(methodOverride());
-// app.use(app.router);
-// app.use(auth.connect(basic));
 app.use(stylus.middleware({
   src: path.join(__dirname, 'public'),
   compile: function(str, path) {
@@ -49,6 +47,19 @@ app.use(stylus.middleware({
       .use(nib())
   }
 }));
+app.use(function(req, res, next) {
+  req.rawData = '';
+  if (req.header('content-type') == 'text/plain') {
+    req.on('data', function(chunk) {
+      req.rawData += chunk;
+    })
+    req.on('end', function() {
+      next();
+    })
+  } else {
+    next();
+  }
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -72,16 +83,6 @@ app.options("*", function(req, res, next) {
   res.send(200);
 });
 
-
-// app.get('/', routes.index);
-// jade prep stuff
-// app.get('/common/:id', routes.common);
-// app.get('/widget/:id', routes.widget);
-// app.get('/dashboard', routes.dashboard);
-// app.get('/dashboard/:name', routes.dashboardByName);
-// app.get('/editor', routes.editor);
-// app.get('/dashanti', routes.dashanti);
-
 app.get('/partials/:name', function(req, res) {
   var name = req.params.name;
   res.render('partials/' + name);
@@ -91,27 +92,28 @@ app.get('/', index.home);
 app.get('/config', function(req, res) {
   res.json(appConfig)
 });
-app.get('/svn/status', revisions.status);
-app.get('/svn/update', revisions.update);
-app.get('/svn/cleanup', revisions.cleanup);
-app.get('/svn/info', revisions.info);
-app.get('/svn/info/server', revisions.serverInfo);
-app.get('/svn/revision/:revision', revisions.revision);
+app.get('/svn/status', subversion.status);
+app.get('/svn/update', subversion.update);
+app.get('/svn/cleanup', subversion.cleanup);
+app.get('/svn/info', subversion.info);
+app.get('/svn/info/server', subversion.serverInfo);
+app.get('/svn/revision/:revision', subversion.revision);
 app.get('/svn/revision/:revision/modules', revisions.revisionModules);
 app.get('/svn/revision/:revision/modules/dependants', revisions.revisionModulesDependants);
 app.get('/svn/revision/:revision/find', revisions.find);
-app.get('/svn/revision/:revision/index', revisions.index);
-app.get('/svn/diff/:revision', revisions.diffJson);
-app.get('/svn/diff/:revision/html', revisions.diffHtml);
-app.get('/svn/diffs/:revision', revisions.diffsJson);
-app.get('/svn/diffs/:revision/html', revisions.diffsHtml);
+app.get('/svn/revision/:revision/index', indexer.index);
+app.post('/svn/diff/', diff.diffJsonPost);
+app.post('/svn/diff/html', diff.diffHtmlPost);
+app.get('/svn/diff/:revision', diff.diffJson);
+app.get('/svn/diff/:revision/html', diff.diffHtml);
+app.get('/svn/diffs/:revision', diff.diffsJson);
+app.get('/svn/diffs/:revision/html', diff.diffsHtml);
 app.get('/maven/dotfiles/generate', maven.generateDotFiles);
-app.get('/maven/dotfiles/list', maven.listDoFiles);
+app.get('/maven/dotfiles/list', maven.listDotFiles);
 app.get('/maven/dotfiles/:moduleId', maven.parseDotFile);
-app.get('/maven/module/all', maven.tree);
-app.get('/maven/module/all.tree.json', maven.uiTree);
-app.get('/maven/module/all/html', maven.htmlTree);
-app.get('/maven/module/:moduleId', maven.module);
+app.get('/maven/module/:moduleId', maven.moduleTree);
+app.get('/maven/module/:moduleId/tree.json', maven.uiTree);
+app.get('/maven/module/:moduleId/html', maven.htmlTree);
 app.get('/maven/module/:moduleId/dependants', maven.dependants);
 
 var server = http.createServer(app);

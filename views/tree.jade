@@ -12,9 +12,46 @@ html
       script(src='//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js')
       script(src='//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.1/js/bootstrap.min.js')
       script(src='//cdnjs.cloudflare.com/ajax/libs/jstree/3.0.8/jstree.min.js')
-      script(src='/js/tree.js')
+      script.
+        jQuery(function() {
+          $('#tree').jstree({
+            core: {
+              data: {
+                url: '/maven/module/#{moduleId}/tree.json',
+                progressive_render: true
+              },
+              themes: {
+                name: 'proton',
+                responsive: true
+                  // variant: 'large'
+              }
+            },
+            plugins: ["search"],
+            search: {
+              fuzzy: false,
+              show_only_matches: false
+            }
+          }).on('search.jstree', function(nodes, str, res) {
+            $('#search_btn').toggleClass('disabled');
+            $('#search_btn>i').toggleClass('fa-search fa-refresh fa-spin');
+          });;
+
+          var timer = false;
+          $('#search_form').submit(function() {
+            $('#search_btn').toggleClass('disabled');
+            $('#search_btn>i').toggleClass('fa-search fa-refresh fa-spin');
+            if (timer) {
+              clearTimeout(timer);
+            }
+            var term = $('#query').val();
+            timer = setTimeout(function() {
+              $('#tree').jstree(true).search(term, true);
+            }, 250);
+            return false;
+          });
+        });
     body
-      form#search_form.form-inline    
+      form#search_form.form-inline(style='position:absolute; right: 10px; top: 10px;') 
         button#search_btn.pull-right.btn-success.btn.btn-default(type='submit')
             i.fa.fa-search
         input#query.form-control.col-xs-2.pull-right(type='search',placeholder='Search ')

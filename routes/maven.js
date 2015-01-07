@@ -14,8 +14,8 @@ exports.generateDotFiles = function(req, res) {
 		}
 	});
 };
-exports.listDoFiles = function(req, res) {
-	maven.listDoFiles(function(err, json) {
+exports.listDotFiles = function(req, res) {
+	maven.listDotFiles(function(err, json) {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -24,6 +24,7 @@ exports.listDoFiles = function(req, res) {
 		}
 	});
 };
+
 exports.parseDotFile = function(req, res) {
 	maven.parseDotFile(req.params.moduleId, function(err, json) {
 		if (err) {
@@ -35,18 +36,8 @@ exports.parseDotFile = function(req, res) {
 	});
 };
 
-exports.tree = function(req, res) {
-	maven.tree(function(err, json) {
-		if (err) {
-			res.status(500).send(err);
-		} else {
-			var jsiq = new Jsiq(req);
-			res.json(jsiq.transform(json));
-		}
-	});
-};
 exports.uiTree = function(req, res) {
-	maven.uiTree(function(err, json) {
+	maven.uiTree(req.params.moduleId, function(err, json) {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -68,19 +59,22 @@ function transformJson(modules) {
 }
 
 exports.htmlTree = function(req, res) {
-	maven.tree(function(err, json) {
+	var moduleId = req.params.moduleId ? req.params.moduleId : "all";
+	maven.moduleTree(moduleId, function(err, json) {
 		if (err) {
 			res.status(500).send(err);
 		} else {
 			res.render('tree', {
 				title: 'Dependencies Tree',
+				moduleId: moduleId,
 				modules: json
 			});
 		}
 	});
 };
-exports.module = function(req, res) {
-	maven.module(req.params.moduleId, function(err, json) {
+
+exports.moduleTree = function(req, res) {
+	maven.moduleTree(req.params.moduleId, function(err, json) {
 		if (err) {
 			res.status(500).send(err);
 		} else {
@@ -89,6 +83,7 @@ exports.module = function(req, res) {
 		}
 	});
 };
+
 exports.dependants = function(req, res) {
 	maven.dependants(req.params.moduleId, req.query.deep, function(err, json) {
 		if (err) {

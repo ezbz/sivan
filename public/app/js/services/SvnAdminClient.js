@@ -1,4 +1,4 @@
-app.factory('svnClient', function($resource) {
+app.factory('SvnAdminClient', function($resource) {
 	return $resource(BASE_URL + 'svn/:action/:args', {
 		action: 'info',
 		args: ''

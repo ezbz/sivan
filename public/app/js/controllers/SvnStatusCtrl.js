@@ -1,10 +1,14 @@
-angular.module('sivan').controller('SvnStatusCtrl', function($scope, svnClient) {
+angular.module('sivan').controller('SvnStatusCtrl', function($scope, SvnAdminClient) {
 	$scope.fetchRevisions = function() {
-		svnClient.info(function(infoResponse) {
+		SvnAdminClient.info(function(infoResponse) {
 				$scope.revision = infoResponse.revision;
-				svnClient.serverInfo(function(serverResponse) {
-					$scope.serverRevision = serverResponse.revision;
-					$scope.status = 'ok';
+				SvnAdminClient.serverInfo(function(serverResponse) {
+					if (serverResponse.revision) {
+						$scope.serverRevision = serverResponse.revision;
+						$scope.status = 'ok';
+					} else {
+						$scope.status = 'error'
+					}
 				}, function(err) {
 					$scope.status = 'error';
 					$scope.error = err;
@@ -18,10 +22,10 @@ angular.module('sivan').controller('SvnStatusCtrl', function($scope, svnClient) 
 
 	$scope.update = function() {
 		$scope.updating = true;
-		svnClient.update(function(response) {
+		SvnAdminClient.update(function(response) {
 			$scope.fetchRevisions();
 			$scope.updating = false;
-		}, function(err){
+		}, function(err) {
 			$scope.updating = false;
 			console.log(err);
 		});

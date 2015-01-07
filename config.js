@@ -84,6 +84,10 @@ config.elasticsearch = {
               "type": "string",
               "index": "not_analyzed"
             },
+            "date": {
+              "type": "date",
+              "format": "basic_date_time"
+            },
             "modules": {
               "type": "string",
               "index": "not_analyzed"

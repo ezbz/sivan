@@ -6,77 +6,103 @@ nav.navbar.navbar-default.navbar-inverse
 		.collapse.navbar-collapse.navbar-left
 		ul.nav.navbar-nav.navbar-right(ng-controller='SvnStatusCtrl')
 			li 
-				label.label.label-inverse(ng-class='{true:"label-warning"}[serverRevision != revision]') Revision: {{revision}} 
-					span(ng-show='serverRevision != revision') / {{serverRevision}}
+				label.label.label-inverse Repository revision: {{revision}} 
+				label.label.label-inverse Server revision: {{serverRevision}}
 				button.navbar-btn.btn.btn-xs.btn-primary(ng-show='serverRevision != revision', ng-click='update()', ng-disabled='updating') update
 				label.label.label-inverse Server: 
 					span.label.label-inverse(ng-class='{error:"label-warning", ok:"label-success"}[status]') {{status}}
-p.alert(ng-show='error'){{error}}
+div.alert.alert-danger(ng-show='error')
+	i.fa.fa-exclamation-triangle  Error executing query
+	json-formatter(json='error')
 
 div.container-fluid.well
-	form#search_form(role='search')
-		div.form-group.row
+	form.form-horizontal#search_form(role='search')
+		div.form-group.row.col-xs-12
 			input#query.form-control.col-xs-6(type='search',ng-model='query',placeholder='Search...',style='width: 90%')
 			button#search_btn.btn-success.btn.btn-default(type='submit',ng-click='search()')
 				i.fa.fa-search
-		div.form-group.row.col-xs-3(ng-show='allModules')
-			ui-select(ng-model='selections.modules', theme='bootstrap')
-				ui-select-match(placeholder='Select a module') {{$select.selected.key}}
-				ui-select-choices(repeat='module in allModules | filter: $select.search ')
-					div(ng-bind-html='module.key | highlight: $select.search')
-		div.form-group.row.col-xs-3(ng-show='allAuthors')
-			ui-select(ng-model='selections.authors', theme='bootstrap')
-				ui-select-match(placeholder='Select an author') {{$select.selected.key}}
-				ui-select-choices(repeat='author in allAuthors | filter: $select.search ')
-					div(ng-bind-html='author.key | highlight: $select.search')
-		div.form-group.row.col-xs-3(ng-show='allTags')
-			ui-select(ng-model='selections.tags', theme='bootstrap')
-				ui-select-match(placeholder='Select a tag') {{$select.selected.key}}
-				ui-select-choices(repeat='tag in allTags | filter: $select.search ')
-					div(ng-bind-html='tag.key | highlight: $select.search')
-
-div(ng-show='result.hits') Total results: {{result.total}}, max score {{result.max_score}}
+		div.row
+			div.col-xs-3
+				div.form-group.checkbox
+					label(for="checkbox")
+						input.checkbox(type='checkbox',ng-model="selections.filterCiuser", ng-change='search()')
+						span(style='margin-top:0px') Filter ciuser
+			div.col-xs-3(ng-show='allModules')
+				ui-select(ng-model='selections.modules', theme='selectize',on-select='applyModules($item, $model)')
+					ui-select-match(placeholder='Select a module') {{$select.selected.key}}
+					ui-select-choices(repeat='module in allModules | filter: $select.search ')
+						div(ng-bind-html='module.key | highlight: $select.search')
+			div.col-xs-3(ng-show='allAuthors')
+				ui-select(ng-model='selections.authors', theme='selectize',on-select='applyAuthors($item, $model)')
+					ui-select-match(placeholder='Select an author') {{$select.selected.key}}
+					ui-select-choices(repeat='author in allAuthors | filter: $select.search ')
+						div(ng-bind-html='author.key | highlight: $select.search')
+			div.col-xs-3(ng-show='allTags')
+				ui-select(ng-model='selections.tags', theme='selectize',on-select='applyTags($item, $model)')
+					ui-select-match(placeholder='Select a tag') {{$select.selected.key}}
+					ui-select-choices(repeat='tag in allTags | filter: $select.search ')
+						div(ng-bind-html='tag.key | highlight: $select.search')
+		div.row
+			div.col-xs-4
+				div.input-group.col-xs-8.pull-left
+					input.form-control(type='text', ng-model='selections.startDate', bs-datepicker='', placeholder='start date',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyy-MM-dd',data-date-type='string')
+					span.input-group-addon
+						i.fa.fa-calendar
+				div.input-group.col-xs-4.pull-right
+					input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HH:mm:ss',data-time-type='string')
+					span.input-group-addon
+						i.fa.fa-clock-o
+			div.col-xs-4
+				div.input-group.col-xs-8.pull-left
+					input.form-control(type='text', ng-model='selections.endDate', bs-datepicker='', placeholder='end date',data-min-date='{{selections.startDate}}',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyy-MM-dd',data-date-type='string')
+					span.input-group-addon
+						i.fa.fa-calendar
+				div.input-group.col-xs-4.pull-right
+					input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HH:mm:ss',data-time-type='string')
+					span.input-group-addon
+						i.fa.fa-clock-o		
+			div.col-xs-4
+				div.input-group.col-xs-6.pull-left
+					input.form-control(type='text', ng-model='selections.startRevision', placeholder='start revision')
+					span.input-group-addon
+						i.fa.fa-hand-o-right
+				div.input-group.col-xs-6.pull-right
+					input.form-control.input-xs(type='text', ng-model='selections.endRevision',  placeholder='end revision')
+					span.input-group-addon
+						i.fa.fa-hand-o-left		   
 
 div.container-fluid(ng-show='result.hits')
 	div.row
-		div.col-md-8.well
+		div.col-md-10
 			table.table.table-striped.table-fixed(st-table='result.hits')
 				thead
 					tr
 						th.col-md-1(st-sort='_source.revision') Revision
 						th.col-md-1(st-sort='_source.author') Author
 						th.col-md-2(st-sort='_source.date') Date
-						th.col-md-7(st-sort='_source.message') Message
-						th.col-md-1 Action
+						th.col-md-1(st-sort='_source.modules') Modules
+						th.col-md-1(st-sort='_source.tags') Tags
+						th.col-md-4(st-sort='_source.message') Message
+						th.col-md-2 Action
 				tbody
 					tr(ng-repeat='hit in result.hits')
 						td {{hit._source.revision}}
 						td {{hit._source.author}}
-						td {{hit._source.date}}
+						td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
+						td {{hit._source.modules.join(', ')}}
+						td {{hit._source.tags.join(', ')}}
 						td {{hit._source.message}}
-						td
-							a.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source.revision)') diff
-							button.btn.btn-xs.btn-info(data-html=true,bs-popover='popoverFiles(hit._source.files)',title='{{hit._source.files.length}} files') {{hit._source.files.length}} files
+						td(nowrap)
+							button.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source)',ng-disabled='loadingDiff')
+									i.fa.fa-exchange
+							button.btn.btn-xs.btn-info(ng-click='showFiles(hit._source)')
+									i.fa.fa-file-text
+							button.btn.btn-xs.btn-warning(ng-click='showTree(hit._source)')
+									i.fa.fa-tree
+							button.btn.btn-xs.btn-success(ng-click='showReview(hit._source)')
+									i.fa.fa-check-square
 		div.col-md-1
-		div.col-md-3.well
-			table.table.table-striped(st-table='authors',ng-show='authors.length>0')
-				thead
-					tr
-						th(st-sort='author.key') Authors
-						th(st-sort='author.doc_count') Count
-				tbody
-					tr(ng-repeat='author in authors')
-						td {{author.key}}
-						td {{author.doc_count}}
-			table.table.table-striped(st-table='modules',ng-show='modules.length>0')
-				thead
-					tr
-						th(st-sort='module.key') Modules
-						th(st-sort='module.doc_count') Count
-				tbody
-					tr(ng-repeat='module in modules')
-						td {{module.key}}
-						td {{module.doc_count}}
+		div.col-md-2.well
 			table.table.table-striped(st-table='tags',ng-show='tags.length>0')
 				thead
 					tr
@@ -86,4 +112,25 @@ div.container-fluid(ng-show='result.hits')
 					tr(ng-repeat='tag in tags')
 						td {{tag.key}}
 						td {{tag.doc_count}}
+			table.table.table-striped(st-table='modules',ng-show='modules.length>0')
+				thead
+					tr
+						th(st-sort='module.key') Modules
+						th(st-sort='module.doc_count') Count
+				tbody
+					tr(ng-repeat='module in modules')
+						td {{module.key}}
+						td {{module.doc_count}}
+			//- table.table.table-striped(st-table='authors',ng-show='authors.length>0')
+			//- 	thead
+			//- 		tr
+			//- 			th(st-sort='author.key') Authors
+			//- 			th(st-sort='author.doc_count') Count
+			//- 	tbody
+			//- 		tr(ng-repeat='author in authors')
+			//- 			td {{author.key}}
+			//- 			td {{author.doc_count}}
+
+div.label.label-default(ng-show='result.hits') Total results: {{result.total}}, max score {{result.max_score}}
+
 
