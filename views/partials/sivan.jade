@@ -45,20 +45,20 @@ div.container-fluid.well
 		div.row
 			div.col-xs-4
 				div.input-group.col-xs-8.pull-left
-					input.form-control(type='text', ng-model='selections.startDate', bs-datepicker='', placeholder='start date',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyy-MM-dd',data-date-type='string')
+					input.form-control(type='text', ng-model='selections.startDate', bs-datepicker='', placeholder='start date',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
 					span.input-group-addon
 						i.fa.fa-calendar
 				div.input-group.col-xs-4.pull-right
-					input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HH:mm:ss',data-time-type='string')
+					input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
 					span.input-group-addon
 						i.fa.fa-clock-o
 			div.col-xs-4
 				div.input-group.col-xs-8.pull-left
-					input.form-control(type='text', ng-model='selections.endDate', bs-datepicker='', placeholder='end date',data-min-date='{{selections.startDate}}',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyy-MM-dd',data-date-type='string')
+					input.form-control(type='text', ng-model='selections.endDate', bs-datepicker='', placeholder='end date',data-min-date='{{selections.startDate}}',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
 					span.input-group-addon
 						i.fa.fa-calendar
 				div.input-group.col-xs-4.pull-right
-					input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HH:mm:ss',data-time-type='string')
+					input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
 					span.input-group-addon
 						i.fa.fa-clock-o		
 			div.col-xs-4
@@ -69,67 +69,36 @@ div.container-fluid.well
 				div.input-group.col-xs-6.pull-right
 					input.form-control.input-xs(type='text', ng-model='selections.endRevision',  placeholder='end revision')
 					span.input-group-addon
-						i.fa.fa-hand-o-left		   
+						i.fa.fa-hand-o-left
+div.container-fluidw(ng-show='result.hits')
+	button.btn.btn-lg.btn-danger(ng-click='toggleStats()') Stats  
 
 div.container-fluid(ng-show='result.hits')
-	div.row
-		div.col-md-10
-			table.table.table-striped.table-fixed(st-table='result.hits')
-				thead
-					tr
-						th.col-md-1(st-sort='_source.revision') Revision
-						th.col-md-1(st-sort='_source.author') Author
-						th.col-md-2(st-sort='_source.date') Date
-						th.col-md-1(st-sort='_source.modules') Modules
-						th.col-md-1(st-sort='_source.tags') Tags
-						th.col-md-4(st-sort='_source.message') Message
-						th.col-md-2 Action
-				tbody
-					tr(ng-repeat='hit in result.hits')
-						td {{hit._source.revision}}
-						td {{hit._source.author}}
-						td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
-						td {{hit._source.modules.join(', ')}}
-						td {{hit._source.tags.join(', ')}}
-						td {{hit._source.message}}
-						td(nowrap)
-							button.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source)',ng-disabled='loadingDiff')
-									i.fa.fa-exchange
-							button.btn.btn-xs.btn-info(ng-click='showFiles(hit._source)')
-									i.fa.fa-file-text
-							button.btn.btn-xs.btn-warning(ng-click='showTree(hit._source)')
-									i.fa.fa-tree
-							button.btn.btn-xs.btn-success(ng-click='showReview(hit._source)')
-									i.fa.fa-check-square
-		div.col-md-1
-		div.col-md-2.well
-			table.table.table-striped(st-table='tags',ng-show='tags.length>0')
-				thead
-					tr
-						th(st-sort='tag.key') Tags
-						th(st-sort='tag.doc_count') Count
-				tbody
-					tr(ng-repeat='tag in tags')
-						td {{tag.key}}
-						td {{tag.doc_count}}
-			table.table.table-striped(st-table='modules',ng-show='modules.length>0')
-				thead
-					tr
-						th(st-sort='module.key') Modules
-						th(st-sort='module.doc_count') Count
-				tbody
-					tr(ng-repeat='module in modules')
-						td {{module.key}}
-						td {{module.doc_count}}
-			//- table.table.table-striped(st-table='authors',ng-show='authors.length>0')
-			//- 	thead
-			//- 		tr
-			//- 			th(st-sort='author.key') Authors
-			//- 			th(st-sort='author.doc_count') Count
-			//- 	tbody
-			//- 		tr(ng-repeat='author in authors')
-			//- 			td {{author.key}}
-			//- 			td {{author.doc_count}}
+	table.table.table-striped.table-fixed(st-table='result.hits')
+		thead
+			tr
+				th.col-md-1(st-sort='revision') Revision
+				th.col-md-1(st-sort='author') Author
+				th.col-md-2(st-sort='date') Date
+				th.col-md-1(st-sort='modules') Modules
+				th.col-md-1(st-sort='tags') Tags
+				th.col-md-4(st-sort='message') Message
+				th.col-md-2 Action
+		tbody
+			tr(ng-repeat='hit in result.hits')
+				td {{hit._source.revision}}
+				td {{hit._source.author}}
+				td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
+				td {{hit._source.modules.join(', ')}}
+				td {{hit._source.tags.join(', ')}}
+				td {{hit._source.message}}
+				td(nowrap)
+					button.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source)',ng-disabled='loadingDiff',data-title='show diff',bs-tooltip)
+							i.fa.fa-exchange
+					button.btn.btn-xs.btn-info(ng-click='showFiles(hit._source)',data-title='show files',bs-tooltip)
+							i.fa.fa-file-text
+					button.btn.btn-xs.btn-warning(ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies',bs-tooltip)
+							i.fa.fa-tree
 
 div.label.label-default(ng-show='result.hits') Total results: {{result.total}}, max score {{result.max_score}}
 

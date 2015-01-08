@@ -2,3 +2,5 @@ node_modules
 bower_components
 build
 public/app/dist
+cli/bin/npm-debug.log
+cli/node_modules

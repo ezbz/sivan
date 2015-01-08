@@ -13,7 +13,9 @@
   "author": "Erez Mazor",
   "license": "BSD",
   "dependencies": {
-    "commander": "*",
-    "optimist": "~0.3.5"
+    "node.svn": "*",
+    "underscore": "*",
+    "request": "*",
+    "commander": "*"
   }
 }

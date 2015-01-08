@@ -1,4 +1,4 @@
-app.service('esClient', function(esFactory) {
+app.service('EsClient', function(esFactory) {
 	return esFactory({
 		host: 'localhost:9200',
 		apiVersion: '1.2',

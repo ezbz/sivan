@@ -85,7 +85,7 @@ exports.moduleTree = function(req, res) {
 };
 
 exports.dependants = function(req, res) {
-	maven.dependants(req.params.moduleId, req.query.deep, function(err, json) {
+	maven.dependants(req.params.moduleId, function(err, json) {
 		if (err) {
 			res.status(500).send(err);
 		} else {

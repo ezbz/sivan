@@ -1,4 +1,4 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http, $modal, $sce, $log) {
+angular.module('sivan').controller('IndexCtrl', function($scope, EsClient, MavenClient, $http, $modal, $aside, $window) {
 	$scope.selections = {
 		modules: "",
 		authors: "",
@@ -9,7 +9,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 	$scope.loadingTree = false;
 
 	$scope.initSelections = function(callback, errCallback) {
-		esClient.search({
+		EsClient.search({
 			index: 'svn-revision',
 			type: 'revision',
 			body: {
@@ -50,12 +50,24 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 		});
 	};
 
+
+	$scope.hasModuleTree = function(modules) {
+		var arr = ["production", "pom.xml", ".gitignore"];
+		for (var i = 0; i < modules.length; i++) {
+			if (_.indexOf(arr, modules[i]) === -1) {
+				return true;
+			}
+		}
+	}
+
 	$scope.search = function(callback, errCallback) {
 		$scope.error = null;
 		var searchObj = {
 			index: 'svn-revision',
 			type: 'revision',
 			body: {
+				from: 0,
+				size: 100,
 				query: {
 					filtered: {}
 				},
@@ -137,13 +149,20 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 				});
 			}
 			if ($scope.selections.startDate ||
-				$scope.selections.endDate ||
-				$scope.selections.startTime ||
+				$scope.selections.startTime) {
+				searchObj.body.query.filtered.filter.and.push({
+					range: {
+						date: {
+							gte: getEsDateFormat($scope.selections.startDate, $scope.selections.startTime)
+						}
+					}
+				});
+			}
+			if ($scope.selections.endDate ||
 				$scope.selections.endTime) {
 				searchObj.body.query.filtered.filter.and.push({
 					range: {
 						date: {
-							gte: getTimestamp($scope.selections.startDate, $scope.selections.startTime),
 							lte: getTimestamp($scope.selections.endDate, $scope.selections.endTime)
 						}
 					}
@@ -151,7 +170,9 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 			}
 		}
 
-		esClient.search(searchObj).then(function(body) {
+		console.log(searchObj);
+
+		EsClient.search(searchObj).then(function(body) {
 			$scope.result = body.hits;
 			$scope.authors = body.aggregations.authors.buckets;
 			$scope.modules = body.aggregations.modules.buckets;
@@ -167,6 +188,13 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 		});
 	};
 
+	function getEsDateFormat(date, time) {
+		if (date && time) {
+			return date + "T" + time + ".000Z"
+		}
+		return date + "T000000.000Z"
+	}
+
 	function getTimestamp(date, time) {
 		var datetime = moment(date + " " + time + "+02:00", "YYYY-MM-DD HH:mm:ssZZ")
 		return datetime.valueOf();
@@ -174,6 +202,32 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 
 
 	$scope.initSelections();
+
+	$scope.sortBy = function(entry){
+		console.log(entry);
+	}
+
+	$scope.toggleStats = function() {
+		if ($scope.statsPane && $scope.statsPane != null) {
+			$scope.statsPane.$scope.$hide();
+			$scope.statsPane = null;
+			return;
+		}
+
+		$scope.statsPane = $aside({
+			scope: $scope,
+			animation: 'am-slide-right',
+			placement: 'right',
+			container: 'body',
+			template: 'partials/summary.jade',
+			show: false,
+			backdrop: false
+		});
+
+		$scope.statsPane.$promise.then(function() {
+			$scope.statsPane.show();
+		})
+	}
 
 	$scope.showDiff = function(revision) {
 		$scope.loadingDiff = true;
@@ -208,10 +262,21 @@ angular.module('sivan').controller('IndexCtrl', function($scope, esClient, $http
 			html: true
 		});
 	};
-	$scope.showTree = function(revision) {
-		var treeUrl = "maven/module/" + revision.modules.join(',') + "/html";
+	$scope.showDeepTree = function(revision, modules) {
+		MavenClient.dependants({
+			moduleId: modules.join(',')
+		}, function(dependants) {
+			var all = modules.concat(dependants);
+			$scope.showTree(revision, all);
+		}, function(err) {
+			console.error(err)
+		});
+
+	}
+	$scope.showTree = function(revision, modules) {
+		var treeUrl = "maven/module/" + modules.join(',') + "/html";
 		var modal = $modal({
-			title: 'Affected modules and their dependencies for revision ' + revision.revision,
+			title: 'Affected modules and dependants for revision ' + revision,
 			content: '<iframe src="' + treeUrl + '" style="height: 100%;width: 100%; border: 0px" border="0"></iframe>',
 			show: true,
 			container: 'body',

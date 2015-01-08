@@ -16,7 +16,7 @@ config.repository = {
 
 config.svn = {
   url: 'https://svn.il.outbrain.com:8443/repos/Outbrain/trunk',
-  commandParallelism: 50
+  commandParallelism: 10
 }
 
 config.time = {
@@ -29,14 +29,14 @@ config.time = {
 };
 
 config.maven = {
-  m2home: "/Users/erez/.m2",
+  rootNode: "com.outbrain:outbrain:pom:trunk",
   generateDotFilesCmd: "mvn org.apache.maven.plugins:maven-dependency-plugin:2.9:tree -DoutputFile=tree.dot -DoutputType=dot"
 }
 
 config.elasticsearch = {
   host: 'localhost',
   port: 9200,
-  logLevel: 'debug',
+  logLevel: 'warning',
   maven: {
     files: {
       index: 'maven',
