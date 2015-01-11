@@ -1,4 +1,4 @@
-app.factory('MavenClient', function($resource) {
+angular.module('sivan').factory('MavenClient', function($resource) {
 	return $resource(BASE_URL + 'maven/module/:moduleId/:action', {
 		action: '',
 		moduleId: ''

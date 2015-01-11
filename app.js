@@ -105,6 +105,7 @@ app.get('/svn/revision/:revision/index', indexer.index);
 app.post('/svn/diff/', diff.diffJsonPost);
 app.post('/svn/diff/html', diff.diffHtmlPost);
 app.get('/svn/diff/:revision', diff.diffJson);
+app.get('/svn/diff/:revision/index', indexer.indexDiff);
 app.get('/svn/diff/:revision/html', diff.diffHtml);
 app.get('/svn/diffs/:revision', diff.diffsJson);
 app.get('/svn/diffs/:revision/html', diff.diffsHtml);

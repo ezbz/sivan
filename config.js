@@ -1,7 +1,7 @@
 var config = {};
 
 config.logging = {
-  defaultLevel: 'TRACE'
+  defaultLevel: 'trace'
 }
 
 config.cache = {
@@ -16,7 +16,8 @@ config.repository = {
 
 config.svn = {
   url: 'https://svn.il.outbrain.com:8443/repos/Outbrain/trunk',
-  commandParallelism: 10
+  commandParallelism: 10,
+  maxChunkSize: 200,
 }
 
 config.time = {
@@ -80,6 +81,9 @@ config.elasticsearch = {
             //     }
             //   }
             // },
+            "revision": {
+              "type": "long"
+            },
             "tags": {
               "type": "string",
               "index": "not_analyzed"

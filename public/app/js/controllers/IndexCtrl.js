@@ -1,51 +1,41 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, EsClient, MavenClient, $http, $modal, $aside, $window) {
+angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
 	$scope.selections = {
 		modules: "",
 		authors: "",
 		tags: "",
-		filterCiuser: true
+		filterAuthors: true
 	};
+	$scope.defaultSelections = _.clone($scope.selections);
+	$scope.pagination = $scope.defaultPagination = {
+		pageSize: 20,
+		maxPages: 10,
+		pageNumber: 1,
+		totalItems: 0,
+		sortBy: 'revision',
+		sortDirection: 'asc'
+	};
+	$scope.defaultPagination = _.clone($scope.pagination);
 	$scope.loadingDiff = false;
 	$scope.loadingTree = false;
-
+	$scope.resetSearch = function() {
+		$scope.selections = _.clone($scope.defaultSelections);
+		$scope.pagination = _.clone($scope.defaultPagination);
+		$scope.search();
+	};
 	$scope.initSelections = function(callback, errCallback) {
-		EsClient.search({
-			index: 'svn-revision',
-			type: 'revision',
-			body: {
-				aggregations: {
-					authors: {
-						"terms": {
-							"field": "author",
-							"size": 0
-						}
-					},
-					modules: {
-						"terms": {
-							"field": "modules",
-							"size": 0
-						}
-					},
-					tags: {
-						"terms": {
-							"field": "tags",
-							"size": 0
-						}
-					}
-				}
-			}
-		}).then(function(body) {
-			$scope.allAuthors = _.sortBy(body.aggregations.authors.buckets, 'key');
-			$scope.allModules = _.sortBy(body.aggregations.modules.buckets, 'key');
-			$scope.allTags = _.sortBy(body.aggregations.tags.buckets, 'key');
+		EsService.getSelections(function(selections, err) {
+			$scope.allAuthors = selections.allAuthors;
+			$scope.allModules = selections.allModules;
+			$scope.allTags = selections.allTags;
 			if (callback) {
 				callback(body);
 			}
-		}, function(err) {
-			console.log(err)
-			$scope.error = err;
-			if (errCallback) {
-				errCallback(err);
+			if (err) {
+				console.log(err)
+				$scope.error = err;
+				if (errCallback) {
+					errCallback(err);
+				}
 			}
 		});
 	};
@@ -62,151 +52,32 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsClient, Maven
 
 	$scope.search = function(callback, errCallback) {
 		$scope.error = null;
-		var searchObj = {
-			index: 'svn-revision',
-			type: 'revision',
-			body: {
-				from: 0,
-				size: 100,
-				query: {
-					filtered: {}
-				},
-				aggregations: {
-					authors: {
-						"terms": {
-							"field": "author",
-							"size": 5
-						}
-					},
-					modules: {
-						"terms": {
-							"field": "modules",
-							"size": 5
-						}
-					},
-					tags: {
-						"terms": {
-							"field": "tags",
-							"size": 5
-						}
-					}
+		EsService.search({
+				selections: $scope.selections,
+				pagination: $scope.pagination,
+				query: $scope.query
+			},
+			function(body) {
+				$scope.result = body.hits;
+				$scope.authors = body.aggregations.authors.buckets;
+				$scope.modules = body.aggregations.modules.buckets;
+				$scope.tags = body.aggregations.tags.buckets;
+				$scope.pagination.totalItems = body.hits.total;
+				// $scope.toggleStats();
+				if (callback) {
+					callback(body);
 				}
-			}
-		};
-
-		if ($scope.query) {
-			searchObj.body.query.filtered.query = {
-				match: {
-					_all: $scope.query
+			},
+			function(err) {
+				$scope.error = err;
+				if (errCallback) {
+					errCallback(err);
 				}
-			}
-		};
-
-		console.log($scope.selections);
-
-		if (_.compact(_.values($scope.selections)).length > 0) {
-			searchObj.body.query.filtered.filter = {
-				and: []
-			};
-			if ($scope.selections.modules) {
-				searchObj.body.query.filtered.filter.and.push({
-					term: {
-						modules: $scope.selections.modules.key
-					}
-				});
-			}
-			if ($scope.selections.authors) {
-				searchObj.body.query.filtered.filter.and.push({
-					term: {
-						author: $scope.selections.authors.key
-					}
-				});
-			}
-			if ($scope.selections.tags) {
-				searchObj.body.query.filtered.filter.and.push({
-					term: {
-						tags: $scope.selections.tags.key
-					}
-				});
-			}
-			if ($scope.selections.filterCiuser) {
-				searchObj.body.query.filtered.filter.and.push({
-					not: {
-						term: {
-							author: 'ciuser'
-						}
-					}
-				});
-			}
-			if ($scope.selections.startRevision || $scope.selections.endRevision) {
-				searchObj.body.query.filtered.filter.and.push({
-					range: {
-						revision: {
-							gte: $scope.selections.startRevision,
-							lte: $scope.selections.endRevision
-						}
-					}
-				});
-			}
-			if ($scope.selections.startDate ||
-				$scope.selections.startTime) {
-				searchObj.body.query.filtered.filter.and.push({
-					range: {
-						date: {
-							gte: getEsDateFormat($scope.selections.startDate, $scope.selections.startTime)
-						}
-					}
-				});
-			}
-			if ($scope.selections.endDate ||
-				$scope.selections.endTime) {
-				searchObj.body.query.filtered.filter.and.push({
-					range: {
-						date: {
-							lte: getTimestamp($scope.selections.endDate, $scope.selections.endTime)
-						}
-					}
-				});
-			}
-		}
-
-		console.log(searchObj);
-
-		EsClient.search(searchObj).then(function(body) {
-			$scope.result = body.hits;
-			$scope.authors = body.aggregations.authors.buckets;
-			$scope.modules = body.aggregations.modules.buckets;
-			$scope.tags = body.aggregations.tags.buckets;
-			if (callback) {
-				callback(body);
-			}
-		}, function(err) {
-			$scope.error = err;
-			if (errCallback) {
-				errCallback(err);
-			}
-		});
+			});
 	};
-
-	function getEsDateFormat(date, time) {
-		if (date && time) {
-			return date + "T" + time + ".000Z"
-		}
-		return date + "T000000.000Z"
-	}
-
-	function getTimestamp(date, time) {
-		var datetime = moment(date + " " + time + "+02:00", "YYYY-MM-DD HH:mm:ssZZ")
-		return datetime.valueOf();
-	}
 
 
 	$scope.initSelections();
-
-	$scope.sortBy = function(entry){
-		console.log(entry);
-	}
-
 	$scope.toggleStats = function() {
 		if ($scope.statsPane && $scope.statsPane != null) {
 			$scope.statsPane.$scope.$hide();
@@ -283,6 +154,24 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsClient, Maven
 			html: true
 		});
 	};
+
+	$scope.getSortClass = function(sortBy) {
+		if ($scope.pagination.sortBy === sortBy) {
+			return ($scope.pagination.sortDirection === "asc") ? "fa-sort-asc" : "fa-sort-desc";
+		} else {
+			return "fa-sort";
+		}
+	}	
+
+	$scope.sort = function(sortBy) {
+		if ($scope.pagination.sortBy === sortBy) {
+			$scope.pagination.sortDirection = ($scope.pagination.sortDirection === "asc") ? "desc" : "asc";
+		} else {
+			$scope.pagination.sortBy = sortBy;
+			$scope.pagination.sortDirection = "asc";
+		}
+		$scope.search();
+	}
 
 	$scope.applyModules = function(item, model) {
 		$scope.selections.modules = item;

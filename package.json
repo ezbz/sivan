@@ -37,7 +37,6 @@
         "mocha": "*",
         "should": "*",
         "elasticsearch": "*",
-        "node.svn": "*",
         "graphlib-dot": "*",
         "glob": "*",
         "coffee-script": "*",

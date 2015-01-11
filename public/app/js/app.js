@@ -6,6 +6,8 @@ var app = angular.module('sivan', [
   'ngSanitize',
   'ngCookies',
   'ui.select',
+  'ui.bootstrap',
+  'ui.bootstrap.pagination',
   'mgcrea.ngStrap',
   'mgcrea.ngStrap.tooltip',
   'mgcrea.ngStrap.datepicker',
