@@ -1,5 +1,9 @@
 var config = {};
 
+config.app = {
+  port: 3001
+}
+
 config.logging = {
   defaultLevel: 'trace'
 }
