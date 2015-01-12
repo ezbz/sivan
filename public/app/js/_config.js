@@ -14,6 +14,8 @@ appConfig.flatUrl = {
 // var tagsAggration = ejs.TermsAggregation('modules').field('tags').size(0);
 
 appConfig.elasticsearch = {
+	host: 'shanti',
+	port: 9200,
 	filterAuthors: "ciuser",
 	aggregationsQuery: {
 		aggregations: {
