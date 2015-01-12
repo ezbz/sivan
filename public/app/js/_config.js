@@ -1,8 +1,8 @@
 var appConfig = {};
 
 appConfig.rootUrl = {
-	prod: "http://shanti.outbrain.com\\:3000/",
-	dev: "http://localhost\\:3000/"
+	prod: "http://shanti.outbrain.com\\:3001/",
+	dev: "http://localhost\\:3001/"
 };
 appConfig.flatUrl = {
 	prod: "http://shanti.outbrain.com:3000/",
