@@ -5,16 +5,12 @@ appConfig.rootUrl = {
 	dev: "http://localhost\\:3001/"
 };
 appConfig.flatUrl = {
-	prod: "http://shanti.outbrain.com:3000/",
-	dev: "http://localhost:3000/"
+	prod: "http://shanti.outbrain.com:3001/",
+	dev: "http://localhost:3001/"
 };
 
-// var authorsAggration = ejs.TermsAggregation('authors').field('author').size(0);
-// var modulesAggration = ejs.TermsAggregation('modules').field('modules').size(0);
-// var tagsAggration = ejs.TermsAggregation('modules').field('tags').size(0);
-
 appConfig.elasticsearch = {
-	host: 'shanti',
+	host: 'localhost',
 	port: 9200,
 	filterAuthors: "ciuser",
 	aggregationsQuery: {
@@ -63,6 +59,12 @@ appConfig.elasticsearch = {
 					"terms": {
 						"field": "tags",
 						"size": 5
+					}
+				},
+				timeline: {
+					date_histogram: {
+						field: "date",
+						interval: "month"
 					}
 				}
 			}

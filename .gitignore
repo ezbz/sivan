@@ -4,3 +4,4 @@ build
 public/app/dist
 cli/bin/npm-debug.log
 cli/node_modules
+dump.rdb

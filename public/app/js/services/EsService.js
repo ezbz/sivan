@@ -16,7 +16,7 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
     search: function(params, callback, errCallback) {
       var config = AppConfig.getAppConfig().elasticsearch;
       var searchObj = config.searchBaseQuery;
-      searchObj.body.from = params.pagination.pageNumber - 1;
+      searchObj.body.from = (params.pagination.pageSize * (params.pagination.pageNumber - 1));
       searchObj.body.size = params.pagination.pageSize;
 
       searchObj.body.sort = [];
@@ -85,8 +85,10 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           }
         });
       }
+      var hasStart = false, hasEnd = false;
       if (params.selections.startDate ||
         params.selections.startTime) {
+        hasStart = true;
         andFilterItems.push({
           range: {
             date: {
@@ -97,13 +99,28 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
       }
       if (params.selections.endDate ||
         params.selections.endTime) {
+        hasEnd = true;
         andFilterItems.push({
           range: {
             date: {
-              lte: getTimestamp(params.selections.endDate, params.selections.endTime)
+              lte: getEsDateFormat(params.selections.endDate, params.selections.endTime)
             }
           }
         });
+      }
+
+      if(hasStart && hasEnd){
+        var start = parseDate(params.selections.startDate, params.selections.startTime);
+        var end = parseDate(params.selections.endDate, params.selections.endTime);
+        if(end.diff(start,'months') > 12){
+            searchObj.body.aggregations.timeline.date_histogram.interval = 'month'
+        }else if(end.diff(start,'days') > 30){
+            searchObj.body.aggregations.timeline.date_histogram.interval = 'day'
+        }else if(end.diff(start,'hours') > 24){
+            searchObj.body.aggregations.timeline.date_histogram.interval = 'hour'
+        }else{
+            searchObj.body.aggregations.timeline.date_histogram.interval = 'minute'
+        }
       }
 
       if (andFilterItems.length > 0) {
@@ -129,10 +146,9 @@ function getEsDateFormat(date, time) {
   return date + "T000000.000Z"
 }
 
-function getTimestamp(date, time) {
+function parseDate(date, time) {
   if (date === "undefined") {
     date = "";
   }
-  var datetime = moment(date + " " + time + "+02:00", "YYYY-MM-DD HH:mm:ssZZ")
-  return datetime.valueOf();
+  return moment(date + " " + time + "+02:00", "YYYY-MM-DD HH:mm:ssZZ");
 }

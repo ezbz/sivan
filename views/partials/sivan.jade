@@ -15,11 +15,11 @@ div.alert.alert-danger(ng-show='error')
 	i.fa.fa-exclamation-triangle  Error executing query
 	json-formatter(json='error')
 
-div.container-fluid.well
+div.container-fluid.well.well-sm
 	form.form-horizontal#search_form(role='search')
 		div.form-group.row.col-xs-12
 			input#query.form-control.col-xs-6(type='search',ng-model='query',placeholder='Search...',style='width: 90%')
-			button#search_btn.btn-success.btn.btn-default(type='submit',ng-click='search()')
+			button#search_btn.btn-default.btn.btn-default.active(type='submit',ng-click='search()')
 				i.fa.fa-search
 		div.row
 			div.col-xs-3(ng-show='allModules')
@@ -39,29 +39,29 @@ div.container-fluid.well
 						div(ng-bind-html='tag.key | highlight: $select.search')
 			div.col-xs-3
 				div.form-group.checkbox
-					label(for="checkbox")
-						input.checkbox(type='checkbox',ng-model="selections.filterAuthors", ng-change='search()')
+					label(for="ciuser_checkbox")
+						input.checkbox(name='ciuser_checkbox',type='checkbox',ng-model="selections.filterAuthors", ng-change='search()')
 						span(style='margin-top:0px') Filter ciuser
 		div.row
-			div.col-xs-4
-				div.input-group.col-xs-8.pull-left
+			div.col-xs-3
+				div.input-group.col-xs-12.pull-left
 					input.form-control(type='text', ng-model='selections.startDate', bs-datepicker='', placeholder='start date',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
 					span.input-group-addon
 						i.fa.fa-calendar
-				div.input-group.col-xs-4.pull-right
-					input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
-					span.input-group-addon
-						i.fa.fa-clock-o
-			div.col-xs-4
-				div.input-group.col-xs-8.pull-left
+				//- div.input-group.col-xs-4.pull-right
+				//- 	input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
+				//- 	span.input-group-addon
+				//- 		i.fa.fa-clock-o
+			div.col-xs-3
+				div.input-group.col-xs-12.pull-left
 					input.form-control(type='text', ng-model='selections.endDate', bs-datepicker='', placeholder='end date',data-min-date='{{selections.startDate}}',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
 					span.input-group-addon
 						i.fa.fa-calendar
-				div.input-group.col-xs-4.pull-right
-					input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
-					span.input-group-addon
-						i.fa.fa-clock-o		
-			div.col-xs-4
+				//- div.input-group.col-xs-4.pull-right
+				//- 	input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
+				//- 	span.input-group-addon
+				//- 		i.fa.fa-clock-o		
+			div.col-xs-6
 				div.input-group.col-xs-6.pull-left
 					input.form-control(type='text', ng-model='selections.startRevision', placeholder='start revision')
 					span.input-group-addon
@@ -70,13 +70,17 @@ div.container-fluid.well
 					input.form-control.input-xs(type='text', ng-model='selections.endRevision',  placeholder='end revision')
 					span.input-group-addon
 						i.fa.fa-hand-o-left
+		div.row &nbsp;
 		div.row
 			div.col-xs-12.text-center
-				button.btn.btn-sm.btn-success(ng-click='search()') 
+				button.btn.btn.btn-default.active(ng-click='search()') 
 					i.fa.fa-filter &nbsp;Filter  
-				button.btn.btn-sm.btn-danger(ng-click='resetSearch()') 
+				button.btn.btn.btn-danger(ng-click='resetSearch()') 
 					i.fa.fa-close Reset  
 
+div.container-fluid(ng-show='result.hits')
+	.col-sm-12
+		highchart(id='chart',config='highchartsNgConfig')
 
 div.container-fluid(ng-show='result.hits')
 	.col-sm-5
@@ -90,17 +94,17 @@ div.container-fluid(ng-show='result.hits')
 		thead
 			tr
 				th.sortable(ng-click='sort("revision")')
-					i.fa(ng-class='getSortClass("revision")') Revision
+					i.fa(ng-class='getSortClass("revision")') &nbsp;Revision
 				th.sortable(ng-click='sort("author")')
-					i.fa(ng-class='getSortClass("author")') Author
+					i.fa(ng-class='getSortClass("author")') &nbsp;Author
 				th.sortable(ng-click='sort("date")')
-					i.fa(ng-class='getSortClass("date")') Date
+					i.fa(ng-class='getSortClass("date")') &nbsp;Date
 				th.sortable(ng-click='sort("modules")')
-					i.fa(ng-class='getSortClass("modules")') Modules
+					i.fa(ng-class='getSortClass("modules")') &nbsp;Modules
 				th.sortable(ng-click='sort("tags")')
-					i.fa(ng-class='getSortClass("tags")') Tags
+					i.fa(ng-class='getSortClass("tags")') &nbsp;Tags
 				th.sortable(ng-click='sort("message")')
-					i.fa(ng-class='getSortClass("message")') Message
+					i.fa(ng-class='getSortClass("message")') &nbsp;Message
 				th Action
 		tbody
 			tr(ng-repeat='hit in result.hits')
@@ -113,7 +117,7 @@ div.container-fluid(ng-show='result.hits')
 				td(nowrap)
 					button.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source)',ng-disabled='loadingDiff',data-title='show diff',bs-tooltip='')
 							i.fa.fa-exchange
-					button.btn.btn-xs.btn-info(ng-click='showFiles(hit._source)',data-title='show files',bs-tooltip='')
+					button.btn.btn-xs.btn-default.active(ng-click='showFiles(hit._source)',data-title='show files',bs-tooltip='')
 							i.fa.fa-file-text
 					button.btn.btn-xs.btn-warning(ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies',bs-tooltip='')
 							i.fa.fa-tree

@@ -1,7 +1,7 @@
 angular.module('sivan').service('EsClient', function(esFactory) {
 
 	return esFactory({
-		host: 'shanti:9200',
+		host: appConfig.elasticsearch.host + ':' + appConfig.elasticsearch.port,
 		apiVersion: '1.2',
 		log: 'warning'
 	});

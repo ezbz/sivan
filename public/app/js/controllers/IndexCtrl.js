@@ -17,6 +17,61 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	$scope.defaultPagination = _.clone($scope.pagination);
 	$scope.loadingDiff = false;
 	$scope.loadingTree = false;
+
+
+	$scope.highchartsNgConfig = {
+		options: {
+			chart: {
+				zoomType: 'x',
+				marginBottom: 30
+			},
+			title: {
+				text: null
+			},
+		},
+		plotOptions: {
+			area: {
+				fillColor: {
+					linearGradient: {
+						x1: 0,
+						y1: 0,
+						x2: 0,
+						y2: 1
+					},
+					stops: [
+						[0, Highcharts.getOptions().colors[0]],
+						[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+					]
+				},
+				marker: {
+					radius: 2
+				},
+				lineWidth: 1,
+				states: {
+					hover: {
+						lineWidth: 1
+					}
+				},
+				threshold: null
+			}
+		},
+		xAxis: {
+			type: 'datetime',
+			dateTimeLabelFormats: {
+				month: '%b \'%y',
+			}
+		},
+		yAxis: {
+			title: {
+				text: null
+			}
+		},
+		size: {
+			height: 140
+		}
+	};
+
+
 	$scope.resetSearch = function() {
 		$scope.selections = _.clone($scope.defaultSelections);
 		$scope.pagination = _.clone($scope.defaultPagination);
@@ -63,7 +118,38 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				$scope.modules = body.aggregations.modules.buckets;
 				$scope.tags = body.aggregations.tags.buckets;
 				$scope.pagination.totalItems = body.hits.total;
-				// $scope.toggleStats();
+
+				var buckets = body.aggregations.timeline.buckets;
+				var start = moment(buckets[0].key);
+				var end = moment(buckets[buckets.length - 1].key);
+
+				var pointInterval = moment.duration(1, 'months').as('milliseconds');
+				if (end.diff(start, 'days') > 30) {
+					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+						day: '%e. %b'
+					};
+					pointInterval = moment.duration(1, 'days').as('milliseconds');
+				} else if (end.diff(start, 'hours') > 24) {
+					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+						hour: '%H:%M'
+					};
+					pointInterval = moment.duration(1, 'hours').as('milliseconds');
+				} else {
+					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+						minute: '%H:%M'
+					};
+					pointInterval = moment.duration(1, 'minutes').as('milliseconds');
+				}
+
+				$scope.highchartsNgConfig.series = [{
+					showInLegend: false,
+					type: 'areaspline',
+					pointInterval: pointInterval,
+					pointStart: start.valueOf(),
+					data: _.pluck(buckets, 'doc_count')
+				}];
+
+
 				if (callback) {
 					callback(body);
 				}
@@ -161,7 +247,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		} else {
 			return "fa-sort";
 		}
-	}	
+	}
 
 	$scope.sort = function(sortBy) {
 		if ($scope.pagination.sortBy === sortBy) {

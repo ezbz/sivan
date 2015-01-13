@@ -6,6 +6,7 @@ var app = angular.module('sivan', [
   'ngSanitize',
   'ngCookies',
   'ui.select',
+  'ui.router',
   'ui.bootstrap',
   'ui.bootstrap.pagination',
   'mgcrea.ngStrap',
@@ -17,6 +18,7 @@ var app = angular.module('sivan', [
   'mgcrea.ngStrap.aside',
   'elasticsearch',
   'jsonFormatter',
+  'highcharts-ng',
   'smart-table'
 ]).config(['$routeProvider',
   function($routeProvider) {
