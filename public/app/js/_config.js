@@ -8,10 +8,12 @@ appConfig.flatUrl = {
 	prod: "http://shanti.outbrain.com:3001/",
 	dev: "http://localhost:3001/"
 };
+appConfig.esUrl = {
+	prod: "http://shanti.outbrain.com:9200/",
+	dev: "http://localhost:9200/"
+};
 
 appConfig.elasticsearch = {
-	host: 'localhost',
-	port: 9200,
 	filterAuthors: "ciuser",
 	aggregationsQuery: {
 		aggregations: {

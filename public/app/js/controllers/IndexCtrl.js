@@ -124,7 +124,12 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				var end = moment(buckets[buckets.length - 1].key);
 
 				var pointInterval = moment.duration(1, 'months').as('milliseconds');
-				if (end.diff(start, 'days') > 30) {
+				if (end.diff(start, 'months') > 12) {
+					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+						month: '%b \'%y'
+					};
+					pointInterval = moment.duration(1, 'month').as('milliseconds');
+				} else if (end.diff(start, 'days') > 30) {
 					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
 						day: '%e. %b'
 					};
@@ -144,6 +149,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				$scope.highchartsNgConfig.series = [{
 					showInLegend: false,
 					type: 'areaspline',
+					color: Highcharts.getOptions().colors[0],
 					pointInterval: pointInterval,
 					pointStart: start.valueOf(),
 					data: _.pluck(buckets, 'doc_count')
