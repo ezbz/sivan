@@ -1,4 +1,4 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
+angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, IndexAdminClient, $http, $modal, $aside, $window) {
 	$scope.selections = {
 		modules: "",
 		authors: "",
@@ -82,6 +82,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			$scope.allAuthors = selections.allAuthors;
 			$scope.allModules = selections.allModules;
 			$scope.allTags = selections.allTags;
+			$scope.maxIndexedRevision = selections.maxIndexedRevision;
 			if (callback) {
 				callback(body);
 			}
@@ -190,7 +191,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		$scope.statsPane.$promise.then(function() {
 			$scope.statsPane.show();
 		})
-	}
+	};
 
 	$scope.showDiff = function(revision) {
 		$scope.loadingDiff = true;
@@ -225,6 +226,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			html: true
 		});
 	};
+
 	$scope.showDeepTree = function(revision, modules) {
 		MavenClient.dependants({
 			moduleId: modules.join(',')
@@ -235,7 +237,8 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			console.error(err)
 		});
 
-	}
+	};
+
 	$scope.showTree = function(revision, modules) {
 		var treeUrl = "maven/module/" + modules.join(',') + "/html";
 		var modal = $modal({
@@ -253,7 +256,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		} else {
 			return "fa-sort";
 		}
-	}
+	};
 
 	$scope.sort = function(sortBy) {
 		if ($scope.pagination.sortBy === sortBy) {
@@ -263,18 +266,31 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			$scope.pagination.sortDirection = "asc";
 		}
 		$scope.search();
-	}
+	};
 
 	$scope.applyModules = function(item, model) {
 		$scope.selections.modules = item;
 		$scope.search();
-	}
+	};
 	$scope.applyAuthors = function(item, model) {
 		$scope.selections.authors = item;
 		$scope.search();
-	}
+	};
 	$scope.applyTags = function(item, model) {
 		$scope.selections.tags = item;
 		$scope.search();
-	}
+	};
+
+	$scope.index = function(minRevision, maxRevision) {
+		$scope.indexing = true;
+		IndexAdminClient.index({
+			revision: minRevision + ':' + maxRevision
+		}, function(response) {
+			$scope.initSelections();
+			$scope.indexing = false;
+		}, function(err) {
+			$scope.indexing = false;
+			console.log(err);
+		});
+	};
 });

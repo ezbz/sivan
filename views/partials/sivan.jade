@@ -6,8 +6,10 @@ nav.navbar.navbar-default.navbar-inverse
 		.collapse.navbar-collapse.navbar-left
 		ul.nav.navbar-nav.navbar-right(ng-controller='SvnStatusCtrl')
 			li 
+				label.label.label-inverse Indexed revision: {{maxIndexedRevision}} 
 				label.label.label-inverse Repository revision: {{revision}} 
 				label.label.label-inverse Server revision: {{serverRevision}}
+				button.navbar-btn.btn.btn-xs.btn-warning(ng-show='maxIndexedRevision != serverRevision', ng-click='index(maxIndexedRevision,serverRevision)', ng-disabled='indexing') index
 				button.navbar-btn.btn.btn-xs.btn-primary(ng-show='serverRevision != revision', ng-click='update()', ng-disabled='updating') update
 				label.label.label-inverse Server: 
 					span.label.label-inverse(ng-class='{error:"label-warning", ok:"label-success"}[status]') {{status}}

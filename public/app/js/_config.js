@@ -34,6 +34,11 @@ appConfig.elasticsearch = {
 					"field": "tags",
 					"size": 0
 				}
+			},
+			max_revision: {
+				"max": {
+					"field": "revision"
+				}
 			}
 		}
 	},
