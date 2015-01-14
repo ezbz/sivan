@@ -90,7 +90,7 @@ nav.navbar.navbar-default.navbar-inverse
 .container-fluid(ng-show='result.total == 0')
 	.col-sm-12 No results found
 
-.container-fluid(ng-show='result.aggregations.timeline.buckets.length')
+.container-fluid(ng-show='result.total > 0')
 	.col-sm-12
 		highchart(id='chart',config='highchartsNgConfig')
 
