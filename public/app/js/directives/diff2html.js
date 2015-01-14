@@ -3,17 +3,18 @@ angular.module('sivan').directive('diff2html', function($http, $parse) {
 		restrict: 'E',
 		link: function(scope, element, attributes) {
 			attributes.$observe('loadDiff', function(loadFlag) {
-				if (attributes.revision != 'undefined' && loadFlag === 'true') {
-					$http.get(FLAT_URL + "svn/diff/" + attributes.revision, {
+				var revisionAttr = $parse(attributes.revision)(scope);
+				if (revisionAttr != 'undefined' && loadFlag === 'true') {
+					$http.get(FLAT_URL + "svn/diff/" + revisionAttr, {
 						cache: true
 					}).then(function(response) {
 						var html = '';
 						var data = response.data;
 
-						if (attributes.file) {
+						var fileAttr = $parse(attributes.file)(scope);;
+						if (fileAttr) {
 							var fileDiff = _.filter(data, function(file) {
-								console.log(file.oldName + ":" + attributes.file)
-								return file.oldName === attributes.file.substr(1);
+								return file.oldName === fileAttr.substr(1);
 							});
 							html = diff2html.getPrettySideBySideHtmlFromJson(fileDiff);
 						} else {

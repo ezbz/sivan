@@ -72,6 +72,14 @@ appConfig.elasticsearch = {
 					date_histogram: {
 						field: "date",
 						interval: "month"
+					},
+					aggregations: {
+						authors: {
+							"terms": {
+								"field": "author",
+								"size": 0
+							}
+						}
 					}
 				}
 			}

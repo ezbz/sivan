@@ -95,16 +95,17 @@ nav.navbar.navbar-default.navbar-inverse
 		highchart(id='chart',config='highchartsNgConfig')
 
 .container-fluid(ng-show='result.total > 0')
-	.col-sm-5
+	.col-sm-2
 		button.btn.btn-sm.btn-primary(ng-click='toggleStats()') 
 			i.fa.fa-line-chart Show/Hide Statistics  
-	.col-sm-7
+	.col-sm-10
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')
 
 .container-fluid(ng-show='result.total > 0')
-	table.table.table-striped.table-fixed.table-condensed
+	table.table.table-striped.table-fixed.table-condensed.table-hover
 		thead
 			tr
+				th.col-xs-1 &nbsp;
 				th.col-xs-1.sortable(ng-click='sort("revision")')
 					i.fa(ng-class='getSortClass("revision")') &nbsp;Revision
 				th.col-xs-1.sortable(ng-click='sort("author")')
@@ -117,28 +118,27 @@ nav.navbar.navbar-default.navbar-inverse
 					i.fa(ng-class='getSortClass("tags")') &nbsp;Tags
 				th.col-xs-4.sortable(ng-click='sort("message")')
 					i.fa(ng-class='getSortClass("message")') &nbsp;Message
-				th.col-xs-1 Action
 		tbody(ng-repeat='hit in result.hits')
 			tr
+				td(nowrap)
+					button.btn.btn-xs.btn-default.active(ng-click='toggleFiles(hit._source)',data-title='show {{hit._source.files.length}} files',bs-tooltip='')
+							i.fa.fa-file-text
+					button.btn.btn-xs.btn-warning(ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies',bs-tooltip='')
+							i.fa.fa-tree
 				td {{hit._source.revision}}
 				td {{hit._source.author}}
 				td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
 				td {{hit._source.modules.join(', ')}}
 				td {{hit._source.tags.join(', ')}}
 				td {{hit._source.message}}
-				td(nowrap)
-					button.btn.btn-xs.btn-default.active(ng-click='toggleFiles(hit._source)',data-title='show ({{hit._source.files.length}}) files',bs-tooltip='')
-							i.fa.fa-file-text
-					button.btn.btn-xs.btn-warning(ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies',bs-tooltip='')
-							i.fa.fa-tree
 			tr(ng-show='showFiles(hit._source)')
 				td(colspan='7')
 					div(ng-repeat='file in hit._source.files',style='text-align: left') 
 						small
-							button.btn.btn-xs(ng-class='{"M": "btn-primary", "D":"btn-warning", "A":"btn-success"}[file.status]',ng-click='toggleDiff(hit._source)',data-title='diff',bs-tooltip='') {{file.status}} 
+							button.btn.btn-xs(ng-class='{"M": "btn-primary", "D":"btn-warning", "A":"btn-success"}[file.status]',ng-click='toggleDiff(hit._source, file.path)',data-title='diff',bs-tooltip='') {{file.status}} 
 							span.tab-space
 							strong {{file.path}}
-						diff2html(revision='{{hit._source.revision}}', file='{{file.path}}',ng-show='showDiff(hit._source)',load-diff='{{showDiff(hit._source)}}')
+						diff2html(revision='hit._source.revision', file='file.path',ng-show='showDiff(hit._source, file.path)',load-diff='{{showDiff(hit._source, file.path)}}')
 
 .container-fluid(ng-show='result.total > 0')
 	.col-xs-12

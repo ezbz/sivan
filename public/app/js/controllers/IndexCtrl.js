@@ -198,12 +198,15 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		})
 	};
 
-	$scope.showDiff = function(revision) {
-		return $scope.showDiffs[revision.revision];
+	$scope.showDiff = function(revision, file) {
+		return $scope.showDiffs[revision.revision] && $scope.showDiffs[revision.revision][file];
 	};
 
-	$scope.toggleDiff = function(revision) {
-		$scope.showDiffs[revision.revision] = !$scope.showDiffs[revision.revision];
+	$scope.toggleDiff = function(revision, file) {
+		if (!$scope.showDiffs[revision.revision]) {
+			$scope.showDiffs[revision.revision] = {};
+		}
+		$scope.showDiffs[revision.revision][file] = !$scope.showDiffs[revision.revision][file];
 	};
 
 	$scope.toggleFiles = function(revision) {
