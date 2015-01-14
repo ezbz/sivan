@@ -127,19 +127,18 @@ nav.navbar.navbar-default.navbar-inverse
 				td {{hit._source.tags.join(', ')}}
 				td {{hit._source.message}}
 				td(nowrap)
-					button.btn.btn-xs.btn-primary(ng-click='showDiff(hit._source)',ng-disabled='loadingDiff',data-title='show diff',bs-tooltip='')
-							i.fa.fa-exchange
 					button.btn.btn-xs.btn-default.active(ng-click='toggleFiles(hit._source)',data-title='show ({{hit._source.files.length}}) files',bs-tooltip='')
 							i.fa.fa-file-text
 					button.btn.btn-xs.btn-warning(ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies',bs-tooltip='')
 							i.fa.fa-tree
 			tr(ng-show='showFiles(hit._source)')
 				td(colspan='7')
-					div(ng-repeat='file in hit._source.files') 
-						small 
-							strong.label(ng-class='{"M": "label-primary", "D":"label-warning", "A":"label-success"}[file.status]') {{file.status}} 
+					div(ng-repeat='file in hit._source.files',style='text-align: left') 
+						small
+							button.btn.btn-xs(ng-class='{"M": "btn-primary", "D":"btn-warning", "A":"btn-success"}[file.status]',ng-click='toggleDiff(hit._source)',data-title='diff',bs-tooltip='') {{file.status}} 
 							span.tab-space
 							strong {{file.path}}
+						diff2html(revision='{{hit._source.revision}}', file='{{file.path}}',ng-show='showDiff(hit._source)',load-diff='{{showDiff(hit._source)}}')
 
 .container-fluid(ng-show='result.total > 0')
 	.col-xs-12

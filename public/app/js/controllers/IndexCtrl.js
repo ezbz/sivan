@@ -16,8 +16,8 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	};
 	$scope.defaultPagination = _.clone($scope.pagination);
 	$scope.showFiles = {};
+	$scope.showDiffs = {};
 	$scope.showFilters = false;
-	$scope.loadingDiff = false;
 	$scope.loadingTree = false;
 
 
@@ -199,24 +199,11 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	};
 
 	$scope.showDiff = function(revision) {
-		$scope.loadingDiff = true;
-		$http.get(FLAT_URL + "svn/diff/" + revision.revision + "/html").then(function(diffHtml) {
-			$modal({
-				title: 'Diff for revision ' + revision.revision,
-				content: diffHtml.data,
-				show: true,
-				container: 'body',
-				html: true
-			});
-			$scope.loadingDiff = false;
-		}, function(err) {
-			$modal({
-				title: 'Error getting diff for revision ' + revision,
-				content: err,
-				html: true,
-				show: true
-			});
-		})
+		return $scope.showDiffs[revision.revision];
+	};
+
+	$scope.toggleDiff = function(revision) {
+		$scope.showDiffs[revision.revision] = !$scope.showDiffs[revision.revision];
 	};
 
 	$scope.toggleFiles = function(revision) {
@@ -244,7 +231,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			var all = modules.concat(dependants);
 			$scope.showTree(revision, all);
 		}, function(err) {
-			console.error(err)
+			console.log(err)
 		});
 
 	};
