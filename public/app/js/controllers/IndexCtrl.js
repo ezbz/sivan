@@ -7,14 +7,16 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	};
 	$scope.defaultSelections = _.clone($scope.selections);
 	$scope.pagination = $scope.defaultPagination = {
-		pageSize: 20,
+		pageSize: 10,
 		maxPages: 10,
 		pageNumber: 1,
 		totalItems: 0,
 		sortBy: 'revision',
-		sortDirection: 'asc'
+		sortDirection: 'desc'
 	};
 	$scope.defaultPagination = _.clone($scope.pagination);
+	$scope.showFiles = {};
+	$scope.showFilters = false;
 	$scope.loadingDiff = false;
 	$scope.loadingTree = false;
 
@@ -67,7 +69,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			}
 		},
 		size: {
-			height: 140
+			height: 120
 		}
 	};
 
@@ -121,40 +123,43 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				$scope.pagination.totalItems = body.hits.total;
 
 				var buckets = body.aggregations.timeline.buckets;
-				var start = moment(buckets[0].key);
-				var end = moment(buckets[buckets.length - 1].key);
+				if (buckets.length) {
 
-				var pointInterval = moment.duration(1, 'months').as('milliseconds');
-				if (end.diff(start, 'months') > 12) {
-					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
-						month: '%b \'%y'
-					};
-					pointInterval = moment.duration(1, 'month').as('milliseconds');
-				} else if (end.diff(start, 'days') > 30) {
-					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
-						day: '%e. %b'
-					};
-					pointInterval = moment.duration(1, 'days').as('milliseconds');
-				} else if (end.diff(start, 'hours') > 24) {
-					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
-						hour: '%H:%M'
-					};
-					pointInterval = moment.duration(1, 'hours').as('milliseconds');
-				} else {
-					$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
-						minute: '%H:%M'
-					};
-					pointInterval = moment.duration(1, 'minutes').as('milliseconds');
+					var start = moment(buckets[0].key);
+					var end = moment(buckets[buckets.length - 1].key);
+
+					var pointInterval = moment.duration(1, 'months').as('milliseconds');
+					if (end.diff(start, 'months') > 12) {
+						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+							month: '%b \'%y'
+						};
+						pointInterval = moment.duration(1, 'month').as('milliseconds');
+					} else if (end.diff(start, 'days') > 30) {
+						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+							day: '%e. %b'
+						};
+						pointInterval = moment.duration(1, 'days').as('milliseconds');
+					} else if (end.diff(start, 'hours') > 24) {
+						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+							hour: '%H:%M'
+						};
+						pointInterval = moment.duration(1, 'hours').as('milliseconds');
+					} else {
+						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
+							minute: '%H:%M'
+						};
+						pointInterval = moment.duration(1, 'minutes').as('milliseconds');
+					}
+
+					$scope.highchartsNgConfig.series = [{
+						showInLegend: false,
+						type: 'areaspline',
+						color: Highcharts.getOptions().colors[0],
+						pointInterval: pointInterval,
+						pointStart: start.valueOf(),
+						data: _.pluck(buckets, 'doc_count')
+					}];
 				}
-
-				$scope.highchartsNgConfig.series = [{
-					showInLegend: false,
-					type: 'areaspline',
-					color: Highcharts.getOptions().colors[0],
-					pointInterval: pointInterval,
-					pointStart: start.valueOf(),
-					data: _.pluck(buckets, 'doc_count')
-				}];
 
 
 				if (callback) {
@@ -214,17 +219,22 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		})
 	};
 
+	$scope.toggleFiles = function(revision) {
+		$scope.showFiles[revision.revision] = !$scope.showFiles[revision.revision];
+	};
+
 	$scope.showFiles = function(revision) {
-		$modal({
-			title: revision.files.length + ' files in revision ' + revision.revision,
-			content: _.map(revision.files, function(file) {
-				return "(" + file.status + ") " + file.path;
-			}).join('</br>'),
-			show: true,
-			animation: 'am-flip-x',
-			container: 'body',
-			html: true
-		});
+		return $scope.showFiles[revision.revision];
+		// $modal({
+		// 	title: revision.files.length + ' files in revision ' + revision.revision,
+		// 	content: _.map(revision.files, function(file) {
+		// 		return "(" + file.status + ") " + file.path;
+		// 	}).join('</br>'),
+		// 	show: true,
+		// 	animation: 'am-flip-x',
+		// 	container: 'body',
+		// 	html: true
+		// });
 	};
 
 	$scope.showDeepTree = function(revision, modules) {
