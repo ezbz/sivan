@@ -96,6 +96,7 @@ app.get('/svn/status', subversion.status);
 app.get('/svn/update', subversion.update);
 app.get('/svn/cleanup', subversion.cleanup);
 app.get('/svn/info', subversion.info);
+app.get('/svn/file/:file', subversion.file);
 app.get('/svn/info/server', subversion.serverInfo);
 app.get('/svn/revision/:revision', subversion.revision);
 app.get('/svn/revision/:revision/modules', revisions.revisionModules);

@@ -1,0 +1,292 @@
+1c: {
+},
+actionscript: {
+    aliases: ['as'],
+},
+apache: {
+    aliases: ['apacheconf'],
+},
+applescript: {
+    aliases: ['osascript'],
+},
+asciidoc: {
+    aliases: ['adoc'],
+},
+aspectj: {
+},
+autohotkey: {
+},
+avrasm: {
+},
+axapta: {
+},
+bash: {
+    aliases: ['sh', 'zsh'],
+},
+brainfuck: {
+    aliases: ['bf'],
+},
+capnproto: {
+    aliases: ['capnp'],
+},
+clojure-repl: {
+},
+clojure: {
+    aliases: ['clj'],
+},
+cmake: {
+    aliases: ['cmake.in'],
+},
+coffeescript: {
+    aliases: ['coffee', 'cson', 'iced'],
+},
+cpp: {
+    aliases: ['c', 'h', 'c++', 'h++'],
+},
+cs: {
+    aliases: ['csharp'],
+},
+css: {
+},
+d: {
+},
+dart: {
+},
+delphi: {
+},
+diff: {
+    aliases: ['patch'],
+},
+django: {
+    aliases: ['jinja'],
+},
+dockerfile: {
+    aliases: ['docker'],
+},
+dos: {
+    aliases: ['bat', 'cmd'],
+},
+dust: {
+    aliases: ['dst'],
+},
+elixir: {
+},
+erb: {
+},
+erlang-repl: {
+},
+erlang: {
+    aliases: ['erl'],
+},
+fix: {
+},
+fsharp: {
+    aliases: ['fs'],
+},
+gcode: {
+        aliases: ['nc'],
+},
+gherkin: {
+    aliases: ['feature'],
+},
+glsl: {
+},
+go: {
+    aliases: ["golang"],
+},
+gradle: {
+},
+groovy: {
+},
+haml: {
+},
+handlebars: {
+    aliases: ['hbs', 'html.hbs', 'html.handlebars'],
+},
+haskell: {
+    aliases: ['hs'],
+},
+haxe: {
+    aliases: ['hx'],
+},
+http: {
+},
+ini: {
+},
+java: {
+    aliases: ['jsp'],
+},
+javascript: {
+    aliases: ['js'],
+},
+json: {
+},
+julia: {
+},
+lasso: {
+    aliases: ['ls', 'lassoscript'],
+},
+less: {
+},
+lisp: {
+},
+livecodeserver: {
+},
+livescript: {
+    aliases: ['ls'],
+},
+lua: {
+},
+makefile: {
+    aliases: ['mk', 'mak'],
+},
+markdown: {
+    aliases: ['md', 'mkdown', 'mkd'],
+},
+mathematica: {
+    aliases: ['mma'],
+},
+matlab: {
+},
+mel: {
+},
+mercury: {
+    aliases: ['m', 'moo'],
+},
+mizar: {
+},
+monkey: {
+},
+nginx: {
+    aliases: ['nginxconf'],
+},
+nimrod: {
+},
+nix: {
+    aliases: ["nixos"],
+},
+nsis: {
+},
+objectivec: {
+    aliases: ['m', 'mm', 'objc', 'obj-c'],
+},
+ocaml: {
+    aliases: ['ml'],
+},
+oxygene: {
+},
+parser3: {
+},
+perl: {
+    aliases: ['pl'],
+},
+pf: {
+    aliases: ['pf.conf'],
+},
+php: {
+    aliases: ['php3', 'php4', 'php5', 'php6'],
+},
+powershell: {
+    aliases: ['ps'],
+},
+processing: {
+},
+profile: {
+},
+protobuf: {
+},
+puppet: {
+    aliases: ['pp'],
+},
+python: {
+    aliases: ['py', 'gyp'],
+},
+q: {
+  aliases:['k', 'kdb'],
+},
+r: {
+},
+rib: {
+},
+roboconf: {
+    aliases: ['graph', 'instances'],
+},
+rsl: {
+},
+ruby: {
+    aliases: ['rb', 'gemspec', 'podspec', 'thor', 'irb'],
+},
+ruleslanguage: {
+},
+rust: {
+    aliases: ['rs'],
+},
+scala: {
+},
+scheme: {
+},
+scilab: {
+    aliases: ['sci'],
+},
+scss: {
+},
+smali: {
+    aliases: ['smali'],
+},
+smalltalk: {
+    aliases: ['st'],
+},
+sml: {
+    aliases: ['ml'],
+},
+sql: {
+},
+stata: {
+    aliases: ['do', 'ado'],
+},
+step21: {
+    aliases: ['p21', 'step', 'stp'],
+},
+stylus: {
+    aliases: ['styl'],
+},
+swift: {
+},
+tcl: {
+    aliases: ['tk'],
+},
+tex: {
+},
+thrift: {
+},
+twig: {
+    aliases: ['craftcms'],
+},
+typescript: {
+    aliases: ['ts'],
+},
+vala: {
+},
+vbnet: {
+    aliases: ['vb'],
+},
+vbscript-html: {
+},
+vbscript: {
+    aliases: ['vbs'],
+},
+verilog: {
+    aliases: ['v'],
+},
+vhdl: {
+},
+vim: {
+},
+x86asm: {
+},
+xl: {
+    aliases: ['tao'],
+},
+xml: {
+    aliases: ['html', 'xhtml', 'rss', 'atom', 'xsl', 'plist'],
+}

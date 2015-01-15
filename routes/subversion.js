@@ -1,6 +1,7 @@
 var config = require('../config');
 var subversion = require('../lib/subversion');
 var diff2html = require('../lib/diff2html');
+var request = require('request');
 var logger = require('../lib/logger').logger(module.filename);
 
 var svnClient = new subversion();
@@ -13,6 +14,26 @@ exports.status = function(req, res) {
       res.json(json);
     }
   });
+};
+
+exports.file = function(req, res) {
+  var file = req.params.file;
+  if (file[0] !== '/') {
+    file = '/' + file;
+  }
+  var url = config.svn.httpUrl + file;
+  request.get(url, function(err, response, body) {
+    if (!err && response.statusCode == 200) {
+      res.send(response.body);
+    } else {
+      res.status(response.statusCode);
+      res.json({
+        file: req.params.file,
+        statusCode: response.statusCode,
+        error: err
+      });
+    }
+  })
 };
 
 exports.update = function(req, res) {

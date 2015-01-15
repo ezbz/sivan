@@ -10,6 +10,7 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           allAuthors: _.sortBy(body.aggregations.authors.buckets, 'key'),
           allModules: _.sortBy(body.aggregations.modules.buckets, 'key'),
           allTags: _.sortBy(body.aggregations.tags.buckets, 'key'),
+          allFileTypes: _.sortBy(body.aggregations.fileTypes.buckets, 'key'),
           maxIndexedRevision: body.aggregations.max_revision.value
         }, err);
       });
@@ -49,6 +50,13 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
         andFilterItems.push({
           term: {
             author: params.selections.authors.key
+          }
+        });
+      }
+      if (params.selections.fileTypes) {
+        andFilterItems.push({
+          term: {
+            fileTypes: params.selections.fileTypes.key
           }
         });
       }

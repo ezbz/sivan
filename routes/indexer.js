@@ -14,25 +14,38 @@ var svnClient = new subversion();
 var esClient = new elasticsearch();
 
 
-esClient.createIndex('svn-revision', function(err) {
-  if (!err) {
-    esClient.waitForStatus('svn-revision', 'green', function() {
-      esClient.closeIndex('svn-revision', function() {
-        esClient.putSettings('svn-revision', config.elasticsearch.revision.settings, function(err, settingsResponse) {
-          logger.info("Response for put settings [%s]", JSON.stringify(settingsResponse));
-          esClient.putMappings('svn-revision', 'revision', config.elasticsearch.revision.mappings, function(err, mappingsResponse) {
-            logger.info("Response for put mappings [%s]", JSON.stringify(mappingsResponse));
-            esClient.openIndex('svn-revision', function() {
-              esClient.waitForStatus('svn-revision', 'green', function() {
-                logger.info("Finished creating index");
-              });
-            });
-          });
-        });
-      });
-    });
-  }
-});
+
+exports.createIndex = function() {
+  async.series([
+    function(callback) {
+      esClient.createIndex('svn-revision', callback);
+    },
+    function(callback) {
+      esClient.waitForStatus('svn-revision', 'green', callback);
+    },
+    function(callback) {
+      esClient.closeIndex('svn-revision', callback);
+    },
+    function(callback) {
+      esClient.putSettings('svn-revision', config.elasticsearch.revision.settings, callback);
+    },
+    function(callback) {
+      esClient.putMappings('svn-revision', 'revision', config.elasticsearch.revision.mappings, callback);
+    },
+    function(callback) {
+      esClient.openIndex('svn-revision', callback);
+    },
+    function(callback) {
+      esClient.waitForStatus('svn-revision', 'green', callback);
+    },
+
+  ], function(err, results) {
+    if (err) {
+      logger.error("Error creating index [%s]", err);
+    }
+    logger.info("Finished creating index, results: [%s]", results);
+  });
+};
 
 
 exports.indexDiff = function(req, res) {

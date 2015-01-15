@@ -1,7 +1,8 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, IndexAdminClient, $http, $modal, $aside, $window) {
+angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
 	$scope.selections = {
 		modules: "",
 		authors: "",
+		fileTypes: "",
 		tags: "",
 		filterAuthors: true
 	};
@@ -17,8 +18,10 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	$scope.defaultPagination = _.clone($scope.pagination);
 	$scope.showFiles = {};
 	$scope.showDiffs = {};
+	$scope.showSources = {};
+	$scope.fileSources = {};
 	$scope.showFilters = false;
-	$scope.loadingTree = false;
+	$scope.loading = false;
 
 
 	$scope.highchartsNgConfig = {
@@ -30,32 +33,6 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			title: {
 				text: null
 			},
-		},
-		plotOptions: {
-			area: {
-				fillColor: {
-					linearGradient: {
-						x1: 0,
-						y1: 0,
-						x2: 0,
-						y2: 1
-					},
-					stops: [
-						[0, Highcharts.getOptions().colors[0]],
-						[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-					]
-				},
-				marker: {
-					radius: 2
-				},
-				lineWidth: 1,
-				states: {
-					hover: {
-						lineWidth: 1
-					}
-				},
-				threshold: null
-			}
 		},
 		xAxis: {
 			type: 'datetime',
@@ -84,6 +61,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			$scope.allAuthors = selections.allAuthors;
 			$scope.allModules = selections.allModules;
 			$scope.allTags = selections.allTags;
+			$scope.allFileTypes = selections.allFileTypes;
 			$scope.maxIndexedRevision = selections.maxIndexedRevision;
 			if (callback) {
 				callback(body);
@@ -120,6 +98,13 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				$scope.authors = body.aggregations.authors.buckets;
 				$scope.modules = body.aggregations.modules.buckets;
 				$scope.tags = body.aggregations.tags.buckets;
+				$scope.fileTypes = body.aggregations.fileTypes.buckets;
+				$scope.siginificantTerms = _.map(body.aggregations.significant_terms.buckets, function(bucket) {
+					return {
+						text: bucket.key,
+						weight: Math.floor(bucket.doc_count * 100 / body.hits.total)
+					}
+				});
 				$scope.pagination.totalItems = body.hits.total;
 
 				var buckets = body.aggregations.timeline.buckets;
@@ -198,6 +183,39 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		})
 	};
 
+	$scope.showSource = function(revision, file) {
+		return $scope.showSources[revision.revision] && $scope.showSources[revision.revision][file];
+	};
+
+	$scope.toggleSource = function(revision, file) {
+		if (!$scope.showSources[revision.revision]) {
+			$scope.showSources[revision.revision] = {};
+		}
+		if (!$scope.fileSources[file]) {
+			$scope.loading = true;
+			var url = FLAT_URL + "svn/file/" + encodeURIComponent(file);
+			$http.get(url, {
+				cache: true
+			}).then(function(response) {
+				$scope.fileSources[file] = response.data;
+				$scope.showSources[revision.revision][file] = !$scope.showSources[revision.revision][file];
+				$scope.loading = false;
+			}, function(err) {
+				console.error(err);
+				$scope.error = err;
+				$scope.loading = false;
+			});
+		} else {
+			$scope.showSources[revision.revision][file] = !$scope.showSources[revision.revision][file];
+		}
+	};
+
+	$scope.getLanguageFromFileName = function(file) {
+		var parts = file.split('.');
+		if (parts.length > 0) {
+			return parts[parts.length - 1];
+		}
+	};
 	$scope.showDiff = function(revision, file) {
 		return $scope.showDiffs[revision.revision] && $scope.showDiffs[revision.revision][file];
 	};
@@ -228,13 +246,17 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	};
 
 	$scope.showDeepTree = function(revision, modules) {
+
+		$scope.loading = true;
 		MavenClient.dependants({
 			moduleId: modules.join(',')
 		}, function(dependants) {
 			var all = modules.concat(dependants);
 			$scope.showTree(revision, all);
+			$scope.loading = false;
 		}, function(err) {
 			console.log(err)
+			$scope.loading = false;
 		});
 
 	};
@@ -281,16 +303,9 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		$scope.search();
 	};
 
-	$scope.index = function(minRevision, maxRevision) {
-		$scope.indexing = true;
-		IndexAdminClient.index({
-			revision: minRevision + ':' + maxRevision
-		}, function(response) {
-			$scope.initSelections();
-			$scope.indexing = false;
-		}, function(err) {
-			$scope.indexing = false;
-			console.log(err);
-		});
+	$scope.applyFileTypes = function(item, model) {
+		$scope.selections.fileTypes = item;
+		$scope.search();
 	};
+
 });

@@ -19,7 +19,8 @@ var app = angular.module('sivan', [
   'elasticsearch',
   'jsonFormatter',
   'highcharts-ng',
-  'smart-table'
+  'angular-jqcloud',
+  'hljs'
 ]).config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.when('/sivan', {

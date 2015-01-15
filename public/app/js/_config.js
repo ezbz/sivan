@@ -18,26 +18,32 @@ appConfig.elasticsearch = {
 	aggregationsQuery: {
 		aggregations: {
 			authors: {
-				"terms": {
-					"field": "author",
-					"size": 0
+				terms: {
+					field: "author",
+					size: 0
 				}
 			},
 			modules: {
-				"terms": {
-					"field": "modules",
-					"size": 0
+				terms: {
+					field: "modules",
+					size: 0
 				}
 			},
 			tags: {
-				"terms": {
-					"field": "tags",
-					"size": 0
+				terms: {
+					field: "tags",
+					size: 0
+				}
+			},
+			fileTypes: {
+				terms: {
+					field: "fileTypes",
+					size: 0
 				}
 			},
 			max_revision: {
-				"max": {
-					"field": "revision"
+				max: {
+					field: "revision"
 				}
 			}
 		}
@@ -51,35 +57,39 @@ appConfig.elasticsearch = {
 			},
 			aggregations: {
 				authors: {
-					"terms": {
-						"field": "author",
-						"size": 5
+					terms: {
+						field: "author",
+						size: 5
 					}
 				},
 				modules: {
-					"terms": {
-						"field": "modules",
-						"size": 5
+					terms: {
+						field: "modules",
+						size: 5
 					}
 				},
 				tags: {
-					"terms": {
-						"field": "tags",
-						"size": 5
+					terms: {
+						field: "tags",
+						size: 5
+					}
+				},
+				fileTypes: {
+					terms: {
+						field: "fileTypes",
+						size: 5
+					}
+				},
+				significant_terms: {
+					significant_terms: {
+						field: "message",
+						size: 20
 					}
 				},
 				timeline: {
 					date_histogram: {
 						field: "date",
 						interval: "month"
-					},
-					aggregations: {
-						authors: {
-							"terms": {
-								"field": "author",
-								"size": 0
-							}
-						}
 					}
 				}
 			}
