@@ -5,6 +5,10 @@ nav.navbar.navbar-default.navbar-inverse
 				img(alt='SiVaN', src='/img/sivan.png')
 		.collapse.navbar-collapse.navbar-left
 		ul.nav.navbar-nav.navbar-right(ng-controller='AdminCtrl')
+			li.navbar-text
+				label.label.label-inverse Source Theme
+				link(rel='stylesheet', type='text/css', ng-href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/{{sourceTheme}}.min.css')
+				select(ng-model='sourceTheme',ng-options='theme as theme for theme in themes',ng-change='updateTheme()')
 			li 
 				label.label.label-inverse Indexed revision: {{maxIndexedRevision}} 
 				label.label.label-inverse Repository revision: {{revision}} 
@@ -109,7 +113,7 @@ nav.navbar.navbar-default.navbar-inverse
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')
 
 .container-fluid(ng-show='result.total > 0')
-	table.table.table-striped.table-fixed.table-condensed
+	table.table.table-fixed.table-condensed.table-striped
 		thead
 			tr
 				th.col-xs-1 &nbsp;
@@ -155,7 +159,8 @@ nav.navbar.navbar-default.navbar-inverse
 						span.tab-space
 						strong 
 							small{{file.path}}
-						div(hljs,ng-show='showSource(hit._source, file.path)',source='fileSources[file.path]')
+						div(ng-show='showSource(hit._source, file.path)')
+							div(hljs,source='fileSources[file.path]')
 						diff2html(revision='hit._source.revision', file='file.path',ng-show='showDiff(hit._source, file.path)',load-diff='{{showDiff(hit._source, file.path)}}')
 .container-fluid(ng-show='result.total > 0')
 	.col-xs-12

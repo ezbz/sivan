@@ -1,4 +1,62 @@
-angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient, IndexAdminClient) {
+angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient, IndexAdminClient, $cookies) {
+	$scope.sourceTheme = $cookies.sourceTheme ? $cookies.sourceTheme : "monokai";
+	$scope.themes = ["arta",
+		"ascetic",
+		"atelier-dune",
+		"atelier-dune",
+		"atelier-forest",
+		"atelier-forest",
+		"atelier-heath",
+		"atelier-heath",
+		"atelier-lakeside",
+		"atelier-lakeside",
+		"atelier-seaside",
+		"atelier-seaside",
+		"brown_paper",
+		"codepen-embed",
+		"color-brewer",
+		"dark",
+		"default",
+		"docco",
+		"far",
+		"foundation",
+		"github",
+		"googlecode",
+		"hybrid",
+		"idea",
+		"ir_black",
+		"kimbie",
+		"kimbie",
+		"magula",
+		"mono-blue",
+		"monokai",
+		"monokai_sublime",
+		"obsidian",
+		"paraiso",
+		"paraiso",
+		"pojoaque",
+		"railscasts",
+		"rainbow",
+		"school_book",
+		"solarized_dark",
+		"solarized_light",
+		"sunburst",
+		"tomorrow-night-blue",
+		"tomorrow-night-bright",
+		"tomorrow-night-eighties",
+		"tomorrow-night",
+		"tomorrow",
+		"vs",
+		"xcode",
+		"zenburn"
+	];
+
+	$scope.updateTheme = function() {
+		if ($scope.sourceTheme != $cookies.sourceTheme) {
+			$cookies.sourceTheme = $scope.sourceTheme;
+		}
+	}
+
 	$scope.fetchRevisions = function() {
 		SvnAdminClient.info(function(infoResponse) {
 				$scope.revision = infoResponse.revision;

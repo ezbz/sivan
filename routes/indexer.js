@@ -13,8 +13,6 @@ var logger = require('../lib/logger').logger(module.filename);
 var svnClient = new subversion();
 var esClient = new elasticsearch();
 
-
-
 exports.createIndex = function() {
   async.series([
     function(callback) {
@@ -48,26 +46,54 @@ exports.createIndex = function() {
 };
 
 
+exports.fetchOrIndexDiff = function(req, res) {
+  esClient.get({
+    index: 'svn-diffs',
+    type: 'diff',
+    data: revisionUtils.denormalizeRevision(req.params.revision)
+  }, function(err, json) {
+    if (_.findWhere(json.docs, {found: false})) {
+      indexDiff(req.params.revision, function(err, json) {
+        res.json(json);
+      });
+    } else {
+      res.json(_.pluck(json.docs, '_source'));
+    }
+  });
+};
+
 exports.indexDiff = function(req, res) {
+  indexDiff(req.params.revision, function(err, json) {
+    res.json(json);
+  });
+}
+
+function indexDiff(revision, callback) {
   var currentDiffsFetched = 0;
   var currentDiffsIndexed = 0;
+  var resultDiffs = [];
+
+  var denormalizedRevisions = revisionUtils.denormalizeRevision(revision);
+  var chunks = toChunks(denormalizedRevisions, config.svn.maxChunkSize);
+  logger.trace("Divided [%s] revisions to [%s] chunks", denormalizedRevisions.length, chunks.length);
+
   var revisionDiffQueue = async.queue(function(revisions, queueCallback) {
     currentDiffsFetched += revisions.length;
-    logger.trace('Fetched diffs for [%s/%s] revisions', currentDiffsFetched, resultRevisions.length);
+    logger.trace('Fetched diffs for [%s/%s] revisions', currentDiffsFetched, denormalizedRevisions.length);
 
     async.mapLimit(revisions, config.svn.commandParallelism, function(revision, aggregateCallback) {
-      var revisionRange = revisionUtils.normalizeRevision(revision.revision);
+      var revisionRange = revisionUtils.normalizeRevision(revision+"");
       svnClient.diffText(revisionRange, function(err, text) {
         if (err) {
           logger.error(err);
           aggregateCallback(null, {
-            revision: revision.revision,
+            revision: revision,
             diff: {}
           });
         } else {
           var diff = diff2html.getJsonFromDiff(text);
           aggregateCallback(null, {
-            revision: revision.revision,
+            id: revision,
             diff: diff
           });
         }
@@ -76,27 +102,26 @@ exports.indexDiff = function(req, res) {
       indexDiffQueue.push({
         diffs: aggregateDiffs
       });
+      resultDiffs = resultDiffs.concat(aggregateDiffs);
       queueCallback(err);
     });
   }, config.svn.commandParallelism);
 
   revisionDiffQueue.drain = function() {
-    res.json({
-      success: true
-    });
+    callback(null, resultDiffs);
   }
 
 
   var indexDiffQueue = async.queue(function(task, queueCallback) {
     currentDiffsIndexed += task.diffs.length;
-    logger.trace('Indexed [%s/%s] diffs', currentDiffsIndexed, resultRevisions.length);
+    logger.trace('Indexed [%s/%s] diffs', currentDiffsIndexed, denormalizedRevisions.length);
 
     esClient.bulkIndex({
       index: 'svn-diffs',
       type: 'diff',
       data: task.diffs,
       idResolver: function(entry) {
-        return entry ? entry.revision : "";
+        return entry ? entry.id : "";
       },
     }, function(err, response) {
       if (err) {
@@ -106,12 +131,9 @@ exports.indexDiff = function(req, res) {
     });
   }, config.svn.commandParallelism);
 
-  var denormalizedRevision = revisionUtils.denormalizeRevision(req.params.revision);
-  var chunks = toChunks(enrichedRevisions, config.svn.maxChunkSize);
-  logger.trace("Divided [%s] revisions to [%s] chunks", revisions.length, chunks.length);
   revisionDiffQueue.push(chunks);
-
 };
+
 exports.index = function(req, res) {
   var resultRevisions = [];
   var currentRevisionsIndexed = 0;

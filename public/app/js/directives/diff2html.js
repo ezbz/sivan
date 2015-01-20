@@ -9,14 +9,16 @@ angular.module('sivan').directive('diff2html', function($http, $parse) {
 						cache: true
 					}).then(function(response) {
 						var html = '';
-						var data = response.data;
+						var data = _.findWhere(response.data, {
+							id: revisionAttr
+						}).diff;
 
 						var fileAttr = $parse(attributes.file)(scope);;
 						if (fileAttr) {
-							var fileDiff = _.filter(data, function(file) {
+							var singleDiff = _.filter(data, function(file) {
 								return file.oldName === fileAttr.substr(1);
 							});
-							html = diff2html.getPrettySideBySideHtmlFromJson(fileDiff);
+							html = diff2html.getPrettySideBySideHtmlFromJson(singleDiff);
 						} else {
 							html = diff2html.getPrettySideBySideHtmlFromJson(data);
 						}

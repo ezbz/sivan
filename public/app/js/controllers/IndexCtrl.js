@@ -1,4 +1,5 @@
 angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
+	
 	$scope.selections = {
 		modules: "",
 		authors: "",
