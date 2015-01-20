@@ -140,7 +140,7 @@ nav.navbar.navbar-default.navbar-inverse
 				td {{hit._source.author}}
 				td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
 				td 
-					button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',data-title='show dependencies (experimental)',bs-tooltip='')
+					button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',title='show dependencies (experimental)')
 						i.fa.fa-tree
 					span &nbsp; {{hit._source.modules.join(', ')}}
 				td {{hit._source.tags.join(', ')}}

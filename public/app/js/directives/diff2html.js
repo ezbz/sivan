@@ -9,20 +9,22 @@ angular.module('sivan').directive('diff2html', function($http, $parse) {
 						cache: true
 					}).then(function(response) {
 						var html = '';
-						var data = _.findWhere(response.data, {
-							id: revisionAttr
-						}).diff;
+						if(response.data){							
+							var data = _.findWhere(response.data, {
+								id: revisionAttr
+							}).diff;
 
-						var fileAttr = $parse(attributes.file)(scope);;
-						if (fileAttr) {
-							var singleDiff = _.filter(data, function(file) {
-								return file.oldName === fileAttr.substr(1);
-							});
-							html = diff2html.getPrettySideBySideHtmlFromJson(singleDiff);
-						} else {
-							html = diff2html.getPrettySideBySideHtmlFromJson(data);
+							var fileAttr = $parse(attributes.file)(scope);;
+							if (fileAttr) {
+								var singleDiff = _.filter(data, function(file) {
+									return file.oldName === fileAttr.substr(1);
+								});
+								html = diff2html.getPrettySideBySideHtmlFromJson(singleDiff);
+							} else {
+								html = diff2html.getPrettySideBySideHtmlFromJson(data);
+							}
+							element.html(html)
 						}
-						element.html(html)
 					}, function(err) {
 						console.error(err);
 					});
