@@ -22,8 +22,14 @@ angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient,
 
 	$scope.sync = function() {
 		$scope.syncing = true;
+
 		update(function(response) {
 			$scope.fetchRevisions();
+			if (!$scope.serverRevision) {
+				$scope.error = 'Cannot sync, no server revision present';
+				$scope.syncing = false;
+				return
+			}
 			index($scope.maxIndexedRevision, $scope.serverRevision, function(response) {
 				$scope.initSelections();
 				$scope.syncing = false;
