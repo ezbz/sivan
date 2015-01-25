@@ -16,6 +16,7 @@ var everyauth = require('everyauth');
 var io = require('socket.io');
 var stylus = require('stylus');
 var nib = require('nib');
+var schedule = require('node-schedule');
 var appConfig = require('./config');
 var subversion = require('./routes/subversion');
 var diff = require('./routes/diff');
@@ -127,6 +128,24 @@ var server = http.createServer(app);
 var iosServer = io.listen(server.listen(app.get('port'), function() {
   logger.info('Express server listening on port ' + app.get('port'));
 }));
+
+if (appConfig.repository.autoSync) {
+  var rule = new schedule.RecurrenceRule();
+  var intervalMinutes = appConfig.repository.autoSyncMinutes ? appConfig.repository.autoSyncMinutes :  5;
+  rule.minute = [0, schedule.Range(intervalMinutes, 60)];
+  var job = schedule.scheduleJob(rule, function() {
+    logger.info('Running scheduled sync');
+    indexer.syncInternal(function(err, results) {
+      if (err && err.length > 0) {
+        logger.error("Error scheduled sync [%s]", JSON.stringify(err));
+      } else {
+        logger.info("Finished scheduled sync");
+      }
+    });
+  });
+
+}
+
 
 iosServer.set('log level', 1); // set level to warn 
 iosServer.sockets.on('connection', function(socket) {

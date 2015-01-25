@@ -48,7 +48,21 @@ exports.createIndex = function(req, res) {
     }
   });
 };
+
 exports.sync = function(req, res) {
+  exports.syncInternal(function(err, results) {
+    if (err && err.length > 0) {
+      logger.error("Error syncing index [%s]", JSON.stringify(err));
+      res.status(500);
+      res.json(err);
+    } else {
+      logger.info("Finished syncing index, results: [%s]", results);
+      res.json(results);
+    }
+  });
+};
+
+exports.syncInternal = function(syncCallback) {
   async.series([
     function(callback) {
       svnClient.cleanup(callback);
@@ -69,7 +83,8 @@ exports.sync = function(req, res) {
               index(maxIndexedId + ':' + serverRevision, function(err, response) {
                 indexCallback(err, response);
               });
-            },function(indexDiffCallback) {
+            },
+            function(indexDiffCallback) {
               indexDiff(maxIndexedId + ':' + serverRevision, function(err, response) {
                 indexDiffCallback(err, response);
               });
@@ -81,14 +96,7 @@ exports.sync = function(req, res) {
       })
     }
   ], function(err, results) {
-    if (err && err.length > 0) {
-      logger.error("Error syncing index [%s]", JSON.stringify(err));
-      res.status(500);
-      res.json(err);
-    } else {
-      logger.info("Finished syncing index, results: [%s]", results);
-      res.json(results);
-    }
+    syncCallback(err, results);
   });
 };
 
@@ -98,15 +106,15 @@ exports.fetchOrIndexDiff = function(req, res) {
     index: 'svn-diffs',
     type: 'diff',
     data: revisionUtils.denormalizeRevision(req.params.revision)
-  }, function(err, json) {
-    if (_.findWhere(json.docs, {
+  }, function(err, results) {
+    if (results.docs && _.findWhere(results.docs, {
         found: false
       })) {
       indexDiff(req.params.revision, function(err, json) {
         res.json(json);
       });
     } else {
-      res.json(_.pluck(json.docs, '_source'));
+      res.json(_.pluck(results.docs, '_source'));
     }
   });
 };
