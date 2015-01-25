@@ -1,5 +1,5 @@
 angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
-	
+
 	$scope.selections = {
 		modules: "",
 		authors: "",
@@ -63,7 +63,6 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			$scope.allModules = selections.allModules;
 			$scope.allTags = selections.allTags;
 			$scope.allFileTypes = selections.allFileTypes;
-			$scope.maxIndexedRevision = selections.maxIndexedRevision;
 			if (callback) {
 				callback(body);
 			}
@@ -139,6 +138,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 
 					$scope.highchartsNgConfig.series = [{
 						showInLegend: false,
+						name: 'revisions',
 						type: 'areaspline',
 						color: Highcharts.getOptions().colors[0],
 						pointInterval: pointInterval,
@@ -194,7 +194,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		}
 		if (!$scope.fileSources[file]) {
 			$scope.loading = true;
-			var url = FLAT_URL + "svn/file/" + encodeURIComponent(file);
+		var url = FLAT_URL + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
 			$http.get(url, {
 				cache: true
 			}).then(function(response) {

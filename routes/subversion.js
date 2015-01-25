@@ -2,6 +2,7 @@ var config = require('../config');
 var subversion = require('../lib/subversion');
 var diff2html = require('../lib/diff2html');
 var request = require('request');
+var fs = require('fs');
 var logger = require('../lib/logger').logger(module.filename);
 
 var svnClient = new subversion();
@@ -21,19 +22,37 @@ exports.file = function(req, res) {
   if (file[0] !== '/') {
     file = '/' + file;
   }
-  var url = config.svn.httpUrl + file;
-  request.get(url, function(err, response, body) {
-    if (!err && response.statusCode == 200) {
-      res.send(response.body);
-    } else {
+  var path = config.repository.path + file;
+  fs.readFile(path, function(err, data) {
+    if (err) {
       res.status(response.statusCode);
       res.json({
         file: req.params.file,
-        statusCode: response.statusCode,
         error: err
       });
+    } else {
+      res.setHeader('content-type', 'text/plain');
+      res.send(data);
     }
   })
+};
+exports.revisionFile = function(req, res) {
+  var file = req.params.file;
+  if (file[0] !== '/') {
+    file = '/' + file;
+  }
+  var revision = req.params.revision;
+  svnClient.cat({
+    path: config.repository.path + file,
+    revision: revision
+  }, function(err, data) {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.setHeader('content-type', 'text/plain');
+      res.send(data);
+    }
+  });
 };
 
 exports.update = function(req, res) {

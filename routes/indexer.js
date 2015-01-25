@@ -13,7 +13,7 @@ var logger = require('../lib/logger').logger(module.filename);
 var svnClient = new subversion();
 var esClient = new elasticsearch();
 
-exports.createIndex = function() {
+exports.createIndex = function(req, res) {
   async.series([
     function(callback) {
       esClient.createIndex('svn-revision', callback);
@@ -40,8 +40,55 @@ exports.createIndex = function() {
   ], function(err, results) {
     if (err) {
       logger.error("Error creating index [%s]", err);
+      res.status(500);
+      res.json(err);
+    } else {
+      logger.info("Finished creating index, results: [%s]", results);
+      res.json(results);
     }
-    logger.info("Finished creating index, results: [%s]", results);
+  });
+};
+exports.sync = function(req, res) {
+  async.series([
+    function(callback) {
+      svnClient.cleanup(callback);
+    },
+    function(callback) {
+      svnClient.update(callback);
+    },
+    function(callback) {
+      svnClient.serverInfo(function(serverInfoErr, info) {
+        var serverRevision = info.revision;
+        esClient.maxId({
+          index: 'svn-revision',
+          type: 'revision'
+        }, function(infoErr, searchResult) {
+          var maxIndexedId = searchResult.hits.hits[0]._id;
+          async.parallel([
+            function(indexCallback) {
+              index(maxIndexedId + ':' + serverRevision, function(err, response) {
+                indexCallback(err, response);
+              });
+            },function(indexDiffCallback) {
+              indexDiff(maxIndexedId + ':' + serverRevision, function(err, response) {
+                indexDiffCallback(err, response);
+              });
+            }
+          ], function(err, results) {
+            callback(err, results);
+          })
+        })
+      })
+    }
+  ], function(err, results) {
+    if (err && err.length > 0) {
+      logger.error("Error syncing index [%s]", JSON.stringify(err));
+      res.status(500);
+      res.json(err);
+    } else {
+      logger.info("Finished syncing index, results: [%s]", results);
+      res.json(results);
+    }
   });
 };
 
@@ -52,7 +99,9 @@ exports.fetchOrIndexDiff = function(req, res) {
     type: 'diff',
     data: revisionUtils.denormalizeRevision(req.params.revision)
   }, function(err, json) {
-    if (_.findWhere(json.docs, {found: false})) {
+    if (_.findWhere(json.docs, {
+        found: false
+      })) {
       indexDiff(req.params.revision, function(err, json) {
         res.json(json);
       });
@@ -82,7 +131,7 @@ function indexDiff(revision, callback) {
     logger.trace('Fetched diffs for [%s/%s] revisions', currentDiffsFetched, denormalizedRevisions.length);
 
     async.mapLimit(revisions, config.svn.commandParallelism, function(revision, aggregateCallback) {
-      var revisionRange = revisionUtils.normalizeRevision(revision+"");
+      var revisionRange = revisionUtils.normalizeRevision(revision + "");
       svnClient.diffText(revisionRange, function(err, text) {
         if (err) {
           logger.error(err);
@@ -135,7 +184,14 @@ function indexDiff(revision, callback) {
 };
 
 exports.index = function(req, res) {
+  index(req.params.revision, function(results) {
+    res.json(results);
+  })
+};
+
+function index(revisionId, callback) {
   var resultRevisions = [];
+  var processErrors = [];
   var currentRevisionsIndexed = 0;
 
   var indexRevisionsQueue = async.queue(function(revisions, queueCallback) {
@@ -151,13 +207,14 @@ exports.index = function(req, res) {
     }, function(err, response) {
       if (err) {
         logger.error(err);
+        processErrors.push(err);
       }
-      queueCallback(err);
+      queueCallback(err, response);
     });
   }, config.svn.commandParallelism);
 
 
-  var normalizedRevision = revisionUtils.normalizeRevision(req.params.revision);
+  var normalizedRevision = revisionUtils.normalizeRevision(revisionId);
   logger.trace('Fetching revisions for [%s]', normalizedRevision);
   svnClient.log(normalizedRevision, function(err, revisions) {
 
@@ -173,7 +230,7 @@ exports.index = function(req, res) {
   });
 
   indexRevisionsQueue.drain = function() {
-    res.json(resultRevisions);
+    callback(processErrors, resultRevisions);
   }
 };
 

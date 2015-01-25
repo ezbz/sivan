@@ -12,13 +12,23 @@ var esClient = new elasticsearch();
 
 exports.find = function(req, res) {
   esClient.get({
-    index: 'svn',
+    index: 'svn-revision',
     type: 'revision',
     data: revisionUtils.denormalizeRevision(req.params.revision)
   }, function(err, json) {
     res.json(json);
   });
 };
+
+exports.maxId = function(req, res) {
+  esClient.maxId({
+    index: 'svn-revision',
+    type: 'revision'
+  }, function(err, results) {
+    console.log(results);
+    res.json({maxId: parseInt(results.hits.hits[0]._id)});
+  })
+}
 
 exports.revisionModules = function(req, res) {
   var normalizedRevision = revisionUtils.normalizeRevision(req.params.revision);

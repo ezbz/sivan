@@ -40,11 +40,6 @@ appConfig.elasticsearch = {
 					field: "fileTypes",
 					size: 0
 				}
-			},
-			max_revision: {
-				max: {
-					field: "revision"
-				}
 			}
 		}
 	},
@@ -89,7 +84,7 @@ appConfig.elasticsearch = {
 				timeline: {
 					date_histogram: {
 						field: "date",
-						interval: "month"
+						interval: "month",
 					}
 				}
 			}

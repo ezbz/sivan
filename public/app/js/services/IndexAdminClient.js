@@ -10,6 +10,22 @@ angular.module('sivan').factory('IndexAdminClient', function($resource) {
 				revision: '',
 				action: 'index'
 			}
+		},
+		maxId: {
+			method: 'GET',
+			isArray: false,
+			params: {
+				revision: 'max',
+				action: ''
+			}
+		},
+		sync: {
+			method: 'GET',
+			isArray: true,
+			params: {
+				revision: 'sync',
+				action: ''
+			}
 		}
 	});
 });

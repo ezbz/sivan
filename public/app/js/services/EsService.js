@@ -10,8 +10,7 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           allAuthors: _.sortBy(body.aggregations.authors.buckets, 'key'),
           allModules: _.sortBy(body.aggregations.modules.buckets, 'key'),
           allTags: _.sortBy(body.aggregations.tags.buckets, 'key'),
-          allFileTypes: _.sortBy(body.aggregations.fileTypes.buckets, 'key'),
-          maxIndexedRevision: body.aggregations.max_revision.value
+          allFileTypes: _.sortBy(body.aggregations.fileTypes.buckets, 'key')
         }, err);
       });
     },
