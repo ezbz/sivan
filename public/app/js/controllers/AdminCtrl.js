@@ -57,7 +57,7 @@ angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient,
 		}
 	}
 
-	$scope.fetchRevisions = function() {
+	$scope.fetchRevisions = function(callback) {
 		IndexAdminClient.maxId(function(maxIdResponse) {
 			$scope.maxIndexedRevision = maxIdResponse.maxId;
 			SvnAdminClient.info(function(infoResponse) {
@@ -69,9 +69,15 @@ angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient,
 						} else {
 							$scope.status = 'error'
 						}
+						if (callback) {
+							callback();
+						}
 					}, function(err) {
 						$scope.status = 'error';
 						$scope.error = err;
+						if (callback) {
+							callback(err);
+						}
 					});
 				},
 				function(err) {
@@ -85,10 +91,14 @@ angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient,
 		$scope.syncing = true;
 		$scope.error = null;
 		IndexAdminClient.sync(function(response) {
-			$scope.syncing = false;
+			$scope.fetchRevisions(function(err) {
+				$scope.syncing = false;
+			});
 		}, function(err) {
-			$scope.syncing = false;
 			$scope.error = err;
+			$scope.fetchRevisions(function(err) {
+				$scope.syncing = false;
+			});
 		});
 	};
 

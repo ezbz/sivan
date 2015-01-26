@@ -5,7 +5,7 @@ nav.navbar.navbar-default.navbar-inverse
 				img(alt='SiVaN', src='/img/sivan.png')
 		.collapse.navbar-collapse.navbar-left
 		ul.nav.navbar-nav.navbar-right(ng-controller='AdminCtrl')
-			li.navbar-text
+			li
 				label.label.label-inverse(ng-show='maxIndexedRevision') Indexed revision: {{maxIndexedRevision}} 
 				label.label.label-inverse(ng-show='revision') Repository revision: {{revision}} 
 				label.label.label-inverse(ng-show='serverRevision') Server revision: {{serverRevision}}
