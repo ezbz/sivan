@@ -29,7 +29,8 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		options: {
 			chart: {
 				zoomType: 'x',
-				marginBottom: 30
+				marginBottom: 30,
+				alignTicks: false
 			},
 			title: {
 				text: null
@@ -41,13 +42,21 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				month: '%b \'%y',
 			}
 		},
-		yAxis: {
+		yAxis: [{
 			title: {
 				text: null
-			}
-		},
+			},
+			min: 0
+		}, {
+			title: {
+				text: null
+			},
+			gridLineWidth: 0,
+			min: 0,
+			opposite: true
+		}],
 		size: {
-			height: 120
+			height: 160
 		}
 	};
 
@@ -118,7 +127,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
 							month: '%b \'%y'
 						};
-						pointInterval = moment.duration(1, 'month').as('milliseconds');
+						pointInterval = moment.duration(1, 'months').as('milliseconds');
 					} else if (end.diff(start, 'days') > 30) {
 						$scope.highchartsNgConfig.xAxis.dateTimeLabelFormats = {
 							day: '%e. %b'
@@ -136,6 +145,15 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						pointInterval = moment.duration(1, 'minutes').as('milliseconds');
 					}
 
+					var addedData = _.map(buckets, function(bucket) {
+						return Math.floor(bucket.added.value);
+					});
+					var addedMax = _.max(addedData);
+					var deletedData = _.map(buckets, function(bucket) {
+						return Math.floor(bucket.deleted.value);
+					});
+					var deletedMax = _.max(deletedData);
+
 					$scope.highchartsNgConfig.series = [{
 						showInLegend: false,
 						name: 'revisions',
@@ -143,7 +161,36 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						color: Highcharts.getOptions().colors[0],
 						pointInterval: pointInterval,
 						pointStart: start.valueOf(),
+						yAxis: 0,
 						data: _.pluck(buckets, 'doc_count')
+					}, {
+						showInLegend: false,
+						name: 'added lines',
+						type: 'spline',
+						marker: {
+							enabled: false
+						},
+						dashStyle: 'shortdot',
+						color: Highcharts.getOptions().colors[2],
+						pointInterval: pointInterval,
+						pointStart: start.valueOf(),
+						tickInterval: addedMax / 4,
+						yAxis: 1,
+						data: addedData
+					}, {
+						showInLegend: false,
+						name: 'deleted lines',
+						type: 'spline',
+						marker: {
+							enabled: false
+						},
+						dashStyle: 'shortdot',
+						color: Highcharts.getOptions().colors[3],
+						pointInterval: pointInterval,
+						pointStart: start.valueOf(),
+						tickInterval: deletedMax / 4,
+						yAxis: 1,
+						data: deletedData
 					}];
 				}
 
@@ -194,7 +241,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		}
 		if (!$scope.fileSources[file]) {
 			$scope.loading = true;
-		var url = FLAT_URL + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
+			var url = FLAT_URL + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
 			$http.get(url, {
 				cache: true
 			}).then(function(response) {

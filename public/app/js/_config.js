@@ -75,6 +75,12 @@ appConfig.elasticsearch = {
 						size: 5
 					}
 				},
+				fileTypes: {
+					terms: {
+						field: "fileTypes",
+						size: 5
+					}
+				},
 				significant_terms: {
 					significant_terms: {
 						field: "message",
@@ -85,6 +91,18 @@ appConfig.elasticsearch = {
 					date_histogram: {
 						field: "date",
 						interval: "month",
+					},
+					aggregations: {
+						added: {
+							sum: {
+								field: "diff.addedLines"
+							}
+						},
+						deleted: {
+							sum: {
+								field: "diff.deletedLines"
+							}
+						}
 					}
 				}
 			}

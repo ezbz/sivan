@@ -25,7 +25,6 @@ exports.maxId = function(req, res) {
     index: 'svn-revision',
     type: 'revision'
   }, function(err, results) {
-    console.log(results);
     res.json({maxId: parseInt(results.hits.hits[0]._id)});
   })
 }

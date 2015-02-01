@@ -9,11 +9,8 @@ angular.module('sivan').directive('diff2html', function($http, $parse) {
 						cache: true
 					}).then(function(response) {
 						var html = '';
-						if(response.data){					
-							var data = _.find(response.data, function(item){
-								return parseInt(item.id) === parseInt(revisionAttr)
-							});
-							var diff = data.diff;
+						if(response.data){
+							var diff = response.data[0];
 							var fileAttr = $parse(attributes.file)(scope);;
 							if (fileAttr) {
 								var singleDiff = _.filter(diff, function(file) {
