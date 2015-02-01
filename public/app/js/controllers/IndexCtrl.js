@@ -54,6 +54,13 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			gridLineWidth: 0,
 			min: 0,
 			opposite: true
+		}, {
+			title: {
+				text: null
+			},
+			gridLineWidth: 0,
+			min: 0,
+			opposite: true
 		}],
 		size: {
 			height: 160
@@ -191,6 +198,21 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						tickInterval: deletedMax / 4,
 						yAxis: 1,
 						data: deletedData
+					}, {
+						showInLegend: false,
+						name: 'authors',
+						type: 'spline',
+						marker: {
+							enabled: false
+						},
+						dashStyle: 'shortdot',
+						color: Highcharts.getOptions().colors[5],
+						pointInterval: pointInterval,
+						pointStart: start.valueOf(),
+						yAxis: 2,
+						data: _.map(buckets, function(bucket) {
+							return bucket.authors.value;
+						})
 					}];
 				}
 

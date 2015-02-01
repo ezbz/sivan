@@ -102,6 +102,11 @@ appConfig.elasticsearch = {
 							sum: {
 								field: "diff.deletedLines"
 							}
+						},
+						authors: {
+							cardinality: {
+								field: "author"
+							}
 						}
 					}
 				}
