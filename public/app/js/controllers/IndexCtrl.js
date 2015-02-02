@@ -252,7 +252,6 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 					}];
 				}
 
-
 				if (callback) {
 					callback(body);
 				}

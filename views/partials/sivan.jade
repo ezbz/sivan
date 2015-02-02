@@ -22,7 +22,7 @@ nav.navbar.navbar-default.navbar-inverse
 	i.fa.fa-exclamation-triangle  Error executing query
 	json-formatter(json='error')
 
-.container-fluid.well
+.container-fluid.well.well-sm
 	form.form.form-horizontal#search_form(role='search')
 		.col-sm-12
 			.form-group.text-center
@@ -107,7 +107,8 @@ nav.navbar.navbar-default.navbar-inverse
 .container-fluid(ng-show='result.total > 0')
 	.col-sm-2
 		button.btn.btn-sm.btn-primary(ng-click='toggleStats()') 
-			i.fa.fa-line-chart Show/Hide Statistics  
+			i.fa.fa-line-chart &nbsp; Show Search Statistics &nbsp; 
+				i.fa.fa-chevron-right
 	.col-sm-10
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')
 
