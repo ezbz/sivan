@@ -16,6 +16,7 @@ appConfig.esUrl = {
 appConfig.elasticsearch = {
 	filterAuthors: "ciuser",
 	aggregationsQuery: {
+		size: 0,
 		aggregations: {
 			authors: {
 				terms: {
@@ -106,6 +107,11 @@ appConfig.elasticsearch = {
 						authors: {
 							cardinality: {
 								field: "author"
+							}
+						},
+						modules: {
+							cardinality: {
+								field: "modules"
 							}
 						}
 					}

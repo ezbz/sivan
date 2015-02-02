@@ -29,11 +29,16 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		options: {
 			chart: {
 				zoomType: 'x',
-				marginBottom: 30,
-				alignTicks: false
+				marginBottom: 30
 			},
 			title: {
 				text: null
+			},
+			legend: {
+				layout: 'horizontal',
+				floating: true,
+				verticalAlign: 'top',
+				itemWidth: 120
 			},
 		},
 		xAxis: {
@@ -51,6 +56,9 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			title: {
 				text: null
 			},
+			labels: {
+				enabled: false
+			},
 			gridLineWidth: 0,
 			min: 0,
 			opposite: true
@@ -58,12 +66,25 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			title: {
 				text: null
 			},
+			labels: {
+				enabled: false
+			},
+			gridLineWidth: 0,
+			min: 0,
+			opposite: true
+		}, {
+			title: {
+				text: null
+			},
+			labels: {
+				enabled: false
+			},
 			gridLineWidth: 0,
 			min: 0,
 			opposite: true
 		}],
 		size: {
-			height: 160
+			height: 200
 		}
 	};
 
@@ -162,7 +183,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 					var deletedMax = _.max(deletedData);
 
 					$scope.highchartsNgConfig.series = [{
-						showInLegend: false,
+						showInLegend: true,
 						name: 'revisions',
 						type: 'areaspline',
 						color: Highcharts.getOptions().colors[0],
@@ -171,7 +192,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						yAxis: 0,
 						data: _.pluck(buckets, 'doc_count')
 					}, {
-						showInLegend: false,
+						showInLegend: true,
 						name: 'added lines',
 						type: 'spline',
 						marker: {
@@ -185,7 +206,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						yAxis: 1,
 						data: addedData
 					}, {
-						showInLegend: false,
+						showInLegend: true,
 						name: 'deleted lines',
 						type: 'spline',
 						marker: {
@@ -199,19 +220,34 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 						yAxis: 1,
 						data: deletedData
 					}, {
-						showInLegend: false,
+						showInLegend: true,
 						name: 'authors',
 						type: 'spline',
 						marker: {
 							enabled: false
 						},
-						dashStyle: 'shortdot',
+						dashStyle: 'dot',
 						color: Highcharts.getOptions().colors[5],
 						pointInterval: pointInterval,
 						pointStart: start.valueOf(),
 						yAxis: 2,
 						data: _.map(buckets, function(bucket) {
 							return bucket.authors.value;
+						})
+					}, {
+						showInLegend: true,
+						name: 'modules',
+						type: 'spline',
+						marker: {
+							enabled: false
+						},
+						dashStyle: 'dot',
+						color: Highcharts.getOptions().colors[8],
+						pointInterval: pointInterval,
+						pointStart: start.valueOf(),
+						yAxis: 3,
+						data: _.map(buckets, function(bucket) {
+							return bucket.modules.value;
 						})
 					}];
 				}
