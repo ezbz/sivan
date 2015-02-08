@@ -1,0 +1,4 @@
+.alert.alert-danger(ng-show='error')
+	a(href='',class='close', data-dismiss='alert') &times;
+	i.fa.fa-exclamation-triangle  Error executing query
+	json-formatter(json='error')

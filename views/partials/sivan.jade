@@ -1,101 +1,6 @@
-nav.navbar.navbar-default.navbar-inverse
-	.container-fluid
-		.navbar-header
-			a.navbar-brand.disabled(href='#/sivan')
-				img(alt='SiVaN', src='/img/sivan.png')
-		.collapse.navbar-collapse.navbar-left
-		ul.nav.navbar-nav.navbar-right(ng-controller='AdminCtrl')
-			li
-				label.label.label-inverse(ng-show='maxIndexedRevision') Indexed revision: {{maxIndexedRevision}} 
-				label.label.label-inverse(ng-show='revision') Repository revision: {{revision}} 
-				label.label.label-inverse(ng-show='serverRevision') Server revision: {{serverRevision}}
-				button.navbar-btn.btn.btn-xs.btn-danger(ng-show='(maxIndexedRevision && serverRevision && revision) && (maxIndexedRevision != serverRevision || serverRevision != revision)',ng-click='sync()', ng-disabled='syncing')
-					i.fa.fa-spinner.fa-spin(ng-show='syncing')
-					i.fa.fa-resize-small(ng-hide='syncing') sync
-				label.label.label-inverse(ng-show='status') Server: 
-					span.label.label-inverse(ng-class='{error:"label-warning", ok:"label-success"}[status]') {{status}}
-				label.label.label-inverse Source Theme
-				link(rel='stylesheet', type='text/css', ng-href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/{{sourceTheme}}.min.css')
-				select(ng-model='sourceTheme',ng-options='theme as theme for theme in themes',ng-change='updateTheme()')
-.alert.alert-danger(ng-show='error')
-	a(href='',class='close', data-dismiss='alert') &times;
-	i.fa.fa-exclamation-triangle  Error executing query
-	json-formatter(json='error')
-
-.container-fluid.well.well-sm
-	form.form.form-horizontal#search_form(role='search')
-		.col-sm-12
-			.form-group.text-center
-				.col-sm-12
-					.input-group
-						input.form-control(type='search',ng-model='query',placeholder='Search...')
-						span.input-group-btn
-							button.btn.btn-primary(ng-disabled='loading',type='submit',ng-click='search()')
-								i.fa(ng-class='{true: "fa-spinner", false: "fa-search"}[loading]')
-							button.align-right.btn.btn-info(href='',ng-click='showFilters = !showFilters')
-								i.fa(ng-class='{true:"fa-minus-circle", false:"fa-plus-circle"}[showFilters]')
-		.col-sm-11(ng-show='showFilters')
-			.form-group
-				.col-sm-2(ng-show='allModules')
-					ui-select(ng-model='selections.modules', theme='selectize',on-select='applyModules($item, $model)')
-						ui-select-match(placeholder='Select a module') {{$select.selected.key}}
-						ui-select-choices(repeat='module in allModules | filter: $select.search ')
-							div(ng-bind-html='module.key | highlight: $select.search')
-				.col-sm-2(ng-show='allAuthors')
-					ui-select(ng-model='selections.authors', theme='selectize',on-select='applyAuthors($item, $model)')
-						ui-select-match(placeholder='Select an author') {{$select.selected.key}}
-						ui-select-choices(repeat='author in allAuthors | filter: $select.search ')
-							div(ng-bind-html='author.key | highlight: $select.search')
-				.col-sm-2(ng-show='allTags')
-					ui-select(ng-model='selections.tags', theme='selectize',on-select='applyTags($item, $model)')
-						ui-select-match(placeholder='Select a tag') {{$select.selected.key}}
-						ui-select-choices(repeat='tag in allTags | filter: $select.search ')
-							div(ng-bind-html='tag.key | highlight: $select.search')
-				.col-sm-2(ng-show='allFileTypes')
-					ui-select(ng-model='selections.fileTypes', theme='selectize',on-select='applyFileTypes($item, $model)')
-						ui-select-match(placeholder='Select a file type') {{$select.selected.key}}
-						ui-select-choices(repeat='fileType in allFileTypes | filter: $select.search ')
-							div(ng-bind-html='fileType.key | highlight: $select.search')
-				.col-lg-3
-					.input-group.checkbox
-						label(for="ciuser_checkbox")
-							input.checkbox(name='ciuser_checkbox',type='checkbox',ng-model="selections.filterAuthors", ng-change='search()')
-							span(style='margin-top:0px') &nbsp;Filter ciuser
-			.form-group
-				.col-xs-3
-					.input-group.col-xs-12.pull-left
-						input.form-control(type='text', ng-model='selections.startDate', bs-datepicker='', placeholder='start date',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
-						span.input-group-addon
-							i.fa.fa-calendar
-					//- .input-group.col-xs-4.pull-right
-					//- 	input.form-control.input-xs(type='text', ng-model='selections.startTime', bs-timepicker='', placeholder='start time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
-					//- 	span.input-group-addon
-					//- 		i.fa.fa-clock-o
-				.col-xs-3
-					.input-group.col-xs-12.pull-left
-						input.form-control(type='text', ng-model='selections.endDate', bs-datepicker='', placeholder='end date',data-min-date='{{selections.startDate}}',data-max-date='today',data-date-format='yyyy-MM-dd', data-model-date-format='yyyyMMdd',data-date-type='string')
-						span.input-group-addon
-							i.fa.fa-calendar
-					//- .input-group.col-xs-4.pull-right
-					//- 	input.form-control.input-xs(type='text', ng-model='selections.endTime', bs-timepicker='', placeholder='end time',data-time-format='HH:mm:ss', data-model-time-format='HHmmss',data-time-type='string')
-					//- 	span.input-group-addon
-					//- 		i.fa.fa-clock-o		
-				.col-xs-6
-					.input-group.col-xs-6.pull-left
-						span.input-group-addon
-							i.fa.fa-hand-o-right
-						input.form-control(type='text', ng-model='selections.startRevision', placeholder='start revision')
-					.input-group.col-xs-6.pull-right
-						input.form-control.input-xs(type='text', ng-model='selections.endRevision',  placeholder='end revision')
-						span.input-group-addon
-							i.fa.fa-hand-o-left
-		.col-sm-1(ng-show='showFilters')
-			.form-group
-				button.btn.btn.btn-primary(ng-disabled='loading',ng-click='search()') 
-					i.fa(ng-class='{true: "fa-spinner", false: "fa-filter"}[loading]') &nbsp;Filter  
-			.form-group
-				button.btn.btn.btn-danger(ng-disabled='loading',ng-click='resetSearch()') 
-					i.fa(ng-class='{true: "fa-spinner", false: "fa-close"}[loading]') &nbsp;Reset  
+ng-include(src="'partials/navbar.jade'")
+ng-include(src="'partials/error.jade'")
+ng-include(src="'partials/search.section.jade'") 
 
 .container-fluid(ng-show='result.total == 0')
 	.col-sm-12 No results found
@@ -134,35 +39,35 @@ nav.navbar.navbar-default.navbar-inverse
 		tbody(ng-repeat='hit in result.hits')
 			tr
 				td
-					button.btn.btn-xs.btn-default(ng-disabled='loading',ng-click='toggleFiles(hit._source)',data-title='show {{hit._source.files.length}} files',bs-tooltip='')
-							i.fa.fa-file-text &nbsp; {{hit._source.files.length}}
-				td {{hit._source.revision}}
-				td {{hit._source.author}}
-				td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
+					button.btn.btn-xs.btn-default(ng-disabled='loading',ng-click='toggleFiles(hit.fields)',data-title='show {{hit.fields["files.path"].length}} files',bs-tooltip='')
+							i.fa.fa-file-text &nbsp; {{hit.fields["files.path"].length}}
+				td {{hit.fields.revision.join(', ')}}
+				td {{hit.fields.author.join(', ')}}
+				td {{hit.fields.date.join(', ') | date:'yyyy-MM-dd HH:mm:ss'}}
 				td 
-					//button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',title='show dependencies (experimental)')
+					//button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit.fields.revision, hit.fields.modules)',ng-show='hasModuleTree(hit.fields.modules)',title='show dependencies (experimental)')
 						i.fa.fa-tree
-					span &nbsp; {{hit._source.modules.join(', ')}}
-				td {{hit._source.tags.join(', ')}}
-				td {{hit._source.fileTypes.join(', ')}}
-				td {{hit._source.message}}
-			tr(ng-show='showFiles(hit._source)')
+					span &nbsp; {{hit.fields.modules.join(', ')}}
+				td {{hit.fields.tags.join(', ')}}
+				td {{hit.fields.fileTypes.join(', ')}}
+				td {{hit.fields.message.join(', ')}}
+			tr(ng-show='showFiles(hit.fields)')
 				td(colspan='8')
-					div(ng-repeat='file in hit._source.files') 
+					div(ng-repeat='file in hit.fields["files.path"] track by $index') 
 						span.tab-space
 						small
-							button.btn.btn-xs.btn-primary(ng-show='file.path',ng-disabled='loading',ng-click='toggleSource(hit._source, file.path)', title='source')
+							button.btn.btn-xs.btn-primary(ng-show='file',ng-disabled='loading',ng-click='toggleSource(hit.fields, file)', title='source')
 								i.fa.fa-code
-							button.btn.btn-xs.btn-success(ng-show='file.path',ng-disabled='loading',ng-click='toggleDiff(hit._source, file.path)', title='diff')
+							button.btn.btn-xs.btn-success(ng-show='file',ng-disabled='loading',ng-click='toggleDiff(hit.fields, file)', title='diff')
 								i.fa.fa-list-ol
 						span.tab-space
-						span.label(ng-class='{"M": "label-warning", "D":"label-danger", "A":"label-primary"}[file.status]'){{file.status}}
+						span.label(ng-class='{"M": "label-warning", "D":"label-danger", "A":"label-primary"}[hit.fields["files.status"][$index]]'){{hit.fields["files.status"][$index]}}
 						span.tab-space
 						strong 
-							small{{file.path}}
-						div(ng-show='showSource(hit._source, file.path)')
-							div(hljs,source='fileSources[file.path]')
-						diff2html(revision='hit._source.revision', file='file.path',ng-show='showDiff(hit._source, file.path)',load-diff='{{showDiff(hit._source, file.path)}}')
+							small{{file}}
+						div(ng-show='showSource(hit.fields, file)')
+							div(hljs,source='fileSources[file]')
+						diff2html(revision='hit.fields.revision', file='file',ng-show='showDiff(hit.fields, file)',load-diff='{{showDiff(hit.fields, file)}}')
 .container-fluid(ng-show='result.total > 0')
 	.col-xs-12
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')

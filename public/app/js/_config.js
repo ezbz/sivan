@@ -50,6 +50,7 @@ appConfig.elasticsearch = {
 		index: 'svn-revision',
 		type: 'revision',
 		body: {
+			fields: ["revision", "author", "date", "fileTypes", "files.status", "files.path", "message", "modules", "tags", "timestamp"],
 			query: {
 				filtered: {}
 			},

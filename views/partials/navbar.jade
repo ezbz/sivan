@@ -1,0 +1,19 @@
+nav.navbar.navbar-default.navbar-inverse
+	.container-fluid
+		.navbar-header
+			a.navbar-brand.disabled(href='#/sivan')
+				img(alt='SiVaN', src='/img/sivan.png')
+		.collapse.navbar-collapse.navbar-left
+		ul.nav.navbar-nav.navbar-right(ng-controller='AdminCtrl')
+			li
+				label.label.label-inverse(ng-show='maxIndexedRevision') Indexed revision: {{maxIndexedRevision}} 
+				label.label.label-inverse(ng-show='revision') Repository revision: {{revision}} 
+				label.label.label-inverse(ng-show='serverRevision') Server revision: {{serverRevision}}
+				button.navbar-btn.btn.btn-xs.btn-danger(ng-show='(maxIndexedRevision && serverRevision && revision) && (maxIndexedRevision != serverRevision || serverRevision != revision)',ng-click='sync()', ng-disabled='syncing')
+					i.fa.fa-spinner.fa-spin(ng-show='syncing')
+					i.fa.fa-resize-small(ng-hide='syncing') sync
+				label.label.label-inverse(ng-show='status') Server: 
+					span.label.label-inverse(ng-class='{error:"label-warning", ok:"label-success"}[status]') {{status}}
+				label.label.label-inverse Source Theme
+				link(rel='stylesheet', type='text/css', ng-href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/{{sourceTheme}}.min.css')
+				select(ng-model='sourceTheme',ng-options='theme as theme for theme in themes',ng-change='updateTheme()')

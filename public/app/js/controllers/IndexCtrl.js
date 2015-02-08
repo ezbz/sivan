@@ -342,16 +342,6 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 
 	$scope.showFiles = function(revision) {
 		return $scope.showFiles[revision.revision];
-		// $modal({
-		// 	title: revision.files.length + ' files in revision ' + revision.revision,
-		// 	content: _.map(revision.files, function(file) {
-		// 		return "(" + file.status + ") " + file.path;
-		// 	}).join('</br>'),
-		// 	show: true,
-		// 	animation: 'am-flip-x',
-		// 	container: 'body',
-		// 	html: true
-		// });
 	};
 
 	$scope.showDeepTree = function(revision, modules) {
