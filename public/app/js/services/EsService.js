@@ -136,7 +136,6 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           and: andFilterItems
         };
       }
-
       EsClient.search(searchObj).then(function(body) {
         callback(body);
       }, function(err) {

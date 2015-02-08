@@ -1,6 +1,6 @@
-ng-include(src="'partials/navbar.jade'")
-ng-include(src="'partials/error.jade'")
-ng-include(src="'partials/search.section.jade'") 
+include navbar.jade
+include error.jade
+include search.section.jade
 
 .container-fluid(ng-show='result.total == 0')
 	.col-sm-12 No results found

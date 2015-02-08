@@ -13,22 +13,22 @@
 		.col-sm-11(ng-show='showFilters')
 			.form-group
 				.col-sm-2(ng-show='allModules')
-					ui-select(ng-model='selections.modules', theme='selectize',on-select='applyModules($item, $model)')
+					ui-select(ng-model='selections.modules', theme='selectize',on-select='applyModules($item, $model)',reset-search-input='true')
 						ui-select-match(placeholder='Select a module') {{$select.selected.key}}
 						ui-select-choices(repeat='module in allModules | filter: $select.search ')
 							div(ng-bind-html='module.key | highlight: $select.search')
 				.col-sm-2(ng-show='allAuthors')
-					ui-select(ng-model='selections.authors', theme='selectize',on-select='applyAuthors($item, $model)')
+					ui-select(ng-model='selections.authors', theme='selectize',on-select='applyAuthors($item, $model)',reset-search-input='true')
 						ui-select-match(placeholder='Select an author') {{$select.selected.key}}
 						ui-select-choices(repeat='author in allAuthors | filter: $select.search ')
 							div(ng-bind-html='author.key | highlight: $select.search')
 				.col-sm-2(ng-show='allTags')
-					ui-select(ng-model='selections.tags', theme='selectize',on-select='applyTags($item, $model)')
+					ui-select(ng-model='selections.tags', theme='selectize',on-select='applyTags($item, $model)',reset-search-input='true')
 						ui-select-match(placeholder='Select a tag') {{$select.selected.key}}
 						ui-select-choices(repeat='tag in allTags | filter: $select.search ')
 							div(ng-bind-html='tag.key | highlight: $select.search')
 				.col-sm-2(ng-show='allFileTypes')
-					ui-select(ng-model='selections.fileTypes', theme='selectize',on-select='applyFileTypes($item, $model)')
+					ui-select(ng-model='selections.fileTypes', theme='selectize',on-select='applyFileTypes($item, $model)',reset-search-input='true')
 						ui-select-match(placeholder='Select a file type') {{$select.selected.key}}
 						ui-select-choices(repeat='fileType in allFileTypes | filter: $select.search ')
 							div(ng-bind-html='fileType.key | highlight: $select.search')
