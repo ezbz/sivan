@@ -1,6 +1,6 @@
 angular.module('sivan').service('EsClient', function(esFactory, AppConfig) {
 	return esFactory({
-		host: AppConfig.getAppConfig().elasticsearch.host,
+		host: ES_URL,
 		apiVersion: '1.2',
 		log: AppConfig.getAppConfig().elasticsearch.logLevel,
 		requestTimeout: AppConfig.getAppConfig().elasticsearch.requestTimeout
