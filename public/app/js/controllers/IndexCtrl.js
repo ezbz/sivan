@@ -125,6 +125,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 
 	$scope.search = function(callback, errCallback) {
 		$scope.error = null;
+		$scope.loading = true;
 		EsService.search({
 				selections: $scope.selections,
 				pagination: $scope.pagination,
@@ -255,9 +256,12 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 				if (callback) {
 					callback(body);
 				}
+
+				$scope.loading = false;
 			},
 			function(err) {
 				$scope.error = err;
+				$scope.loading = false;
 				if (errCallback) {
 					errCallback(err);
 				}

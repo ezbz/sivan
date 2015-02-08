@@ -30,8 +30,8 @@ nav.navbar.navbar-default.navbar-inverse
 					.input-group
 						input.form-control(type='search',ng-model='query',placeholder='Search...')
 						span.input-group-btn
-							button.btn.btn-default.active(type='submit',ng-click='search()')
-								i.fa.fa-search
+							button.btn.btn-primary(ng-disabled='loading',type='submit',ng-click='search()')
+								i.fa(ng-class='{true: "fa-spinner", false: "fa-search"}[loading]')
 							button.align-right.btn.btn-success.active(href='',ng-click='showFilters = !showFilters')
 								i.fa(ng-class='{true:"fa-minus-circle", false:"fa-plus-circle"}[showFilters]')
 		.col-sm-11(ng-show='showFilters')
@@ -91,11 +91,11 @@ nav.navbar.navbar-default.navbar-inverse
 							i.fa.fa-hand-o-left
 		.col-sm-1(ng-show='showFilters')
 			.form-group
-				button.btn.btn.btn-default.active(ng-click='search()') 
-					i.fa.fa-filter &nbsp;Filter  
+				button.btn.btn.btn-primary(ng-disabled='loading',ng-click='search()') 
+					i.fa(ng-class='{true: "fa-spinner", false: "fa-filter"}[loading]') &nbsp;Filter  
 			.form-group
-				button.btn.btn.btn-danger(ng-click='resetSearch()') 
-					i.fa.fa-close Reset  
+				button.btn.btn.btn-danger(ng-disabled='loading',ng-click='resetSearch()') 
+					i.fa(ng-class='{true: "fa-spinner", false: "fa-close"}[loading]') &nbsp;Reset  
 
 .container-fluid(ng-show='result.total == 0')
 	.col-sm-12 No results found
@@ -140,7 +140,7 @@ nav.navbar.navbar-default.navbar-inverse
 				td {{hit._source.author}}
 				td {{hit._source.date | date:'yyyy-MM-dd HH:mm:ss'}}
 				td 
-					button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',title='show dependencies (experimental)')
+					//button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit._source.revision, hit._source.modules)',ng-show='hasModuleTree(hit._source.modules)',title='show dependencies (experimental)')
 						i.fa.fa-tree
 					span &nbsp; {{hit._source.modules.join(', ')}}
 				td {{hit._source.tags.join(', ')}}

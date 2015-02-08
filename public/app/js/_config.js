@@ -15,6 +15,8 @@ appConfig.esUrl = {
 
 appConfig.elasticsearch = {
 	filterAuthors: "ciuser",
+	logLevel: 'warning',
+	requestTimeout: 15000,
 	aggregationsQuery: {
 		size: 0,
 		aggregations: {
