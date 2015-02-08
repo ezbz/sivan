@@ -16,7 +16,7 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
     },
     search: function(params, callback, errCallback) {
       var config = AppConfig.getAppConfig().elasticsearch;
-      var searchObj = config.searchBaseQuery;
+      var searchObj = $.extend(true, {}, config.searchBaseQuery);
       searchObj.body.from = (params.pagination.pageSize * (params.pagination.pageNumber - 1));
       searchObj.body.size = params.pagination.pageSize;
 
@@ -93,7 +93,8 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           }
         });
       }
-      var hasStart = false, hasEnd = false;
+      var hasStart = false,
+        hasEnd = false;
       if (params.selections.startDate ||
         params.selections.startTime) {
         hasStart = true;
@@ -117,17 +118,17 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
         });
       }
 
-      if(hasStart && hasEnd){
+      if (hasStart && hasEnd) {
         var start = parseDate(params.selections.startDate, params.selections.startTime);
         var end = parseDate(params.selections.endDate, params.selections.endTime);
-        if(end.diff(start,'months') > 12){
-            searchObj.body.aggregations.timeline.date_histogram.interval = 'month'
-        }else if(end.diff(start,'days') > 30){
-            searchObj.body.aggregations.timeline.date_histogram.interval = 'day'
-        }else if(end.diff(start,'hours') > 24){
-            searchObj.body.aggregations.timeline.date_histogram.interval = 'hour'
-        }else{
-            searchObj.body.aggregations.timeline.date_histogram.interval = 'minute'
+        if (end.diff(start, 'months') > 12) {
+          searchObj.body.aggregations.timeline.date_histogram.interval = 'month'
+        } else if (end.diff(start, 'days') > 30) {
+          searchObj.body.aggregations.timeline.date_histogram.interval = 'day'
+        } else if (end.diff(start, 'hours') > 24) {
+          searchObj.body.aggregations.timeline.date_histogram.interval = 'hour'
+        } else {
+          searchObj.body.aggregations.timeline.date_histogram.interval = 'minute'
         }
       }
 
