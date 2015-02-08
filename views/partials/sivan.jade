@@ -9,7 +9,7 @@ nav.navbar.navbar-default.navbar-inverse
 				label.label.label-inverse(ng-show='maxIndexedRevision') Indexed revision: {{maxIndexedRevision}} 
 				label.label.label-inverse(ng-show='revision') Repository revision: {{revision}} 
 				label.label.label-inverse(ng-show='serverRevision') Server revision: {{serverRevision}}
-				button.navbar-btn.btn.btn-xs.btn-warning(ng-show='(maxIndexedRevision && serverRevision && revision) && (maxIndexedRevision != serverRevision || serverRevision != revision)',ng-click='sync()', ng-disabled='syncing')
+				button.navbar-btn.btn.btn-xs.btn-danger(ng-show='(maxIndexedRevision && serverRevision && revision) && (maxIndexedRevision != serverRevision || serverRevision != revision)',ng-click='sync()', ng-disabled='syncing')
 					i.fa.fa-spinner.fa-spin(ng-show='syncing')
 					i.fa.fa-resize-small(ng-hide='syncing') sync
 				label.label.label-inverse(ng-show='status') Server: 
@@ -32,7 +32,7 @@ nav.navbar.navbar-default.navbar-inverse
 						span.input-group-btn
 							button.btn.btn-primary(ng-disabled='loading',type='submit',ng-click='search()')
 								i.fa(ng-class='{true: "fa-spinner", false: "fa-search"}[loading]')
-							button.align-right.btn.btn-success.active(href='',ng-click='showFilters = !showFilters')
+							button.align-right.btn.btn-info(href='',ng-click='showFilters = !showFilters')
 								i.fa(ng-class='{true:"fa-minus-circle", false:"fa-plus-circle"}[showFilters]')
 		.col-sm-11(ng-show='showFilters')
 			.form-group
@@ -134,7 +134,7 @@ nav.navbar.navbar-default.navbar-inverse
 		tbody(ng-repeat='hit in result.hits')
 			tr
 				td
-					button.btn.btn-xs.btn-primary(ng-disabled='loading',ng-click='toggleFiles(hit._source)',data-title='show {{hit._source.files.length}} files',bs-tooltip='')
+					button.btn.btn-xs.btn-default(ng-disabled='loading',ng-click='toggleFiles(hit._source)',data-title='show {{hit._source.files.length}} files',bs-tooltip='')
 							i.fa.fa-file-text &nbsp; {{hit._source.files.length}}
 				td {{hit._source.revision}}
 				td {{hit._source.author}}
@@ -150,12 +150,13 @@ nav.navbar.navbar-default.navbar-inverse
 				td(colspan='8')
 					div(ng-repeat='file in hit._source.files') 
 						span.tab-space
-						button.btn.btn-xs.btn-default.active(ng-show='file.path',ng-disabled='loading',ng-click='toggleSource(hit._source, file.path)', title='source')
-							i.fa.fa-code
-						button.btn.btn-xs.btn-success.active(ng-show='file.path',ng-disabled='loading',ng-click='toggleDiff(hit._source, file.path)', title='diff')
-							i.fa.fa-list-ol
+						small
+							button.btn.btn-xs.btn-primary(ng-show='file.path',ng-disabled='loading',ng-click='toggleSource(hit._source, file.path)', title='source')
+								i.fa.fa-code
+							button.btn.btn-xs.btn-success(ng-show='file.path',ng-disabled='loading',ng-click='toggleDiff(hit._source, file.path)', title='diff')
+								i.fa.fa-list-ol
 						span.tab-space
-						span.label(ng-class='{"M": "label-primary", "D":"label-warning", "A":"label-success"}[file.status]') {{file.status}} 
+						span.label(ng-class='{"M": "label-warning", "D":"label-danger", "A":"label-primary"}[file.status]'){{file.status}}
 						span.tab-space
 						strong 
 							small{{file.path}}
