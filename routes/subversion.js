@@ -79,7 +79,12 @@ exports.info = function(req, res) {
 
 exports.serverInfo = function(req, res) {
   svnClient.serverInfo(function(err, json) {
-    res.json(json);
+    if (err) {
+      console.log(err);
+      res.json(err);
+    } else {
+      res.json(json);
+    }
   });
 };
 

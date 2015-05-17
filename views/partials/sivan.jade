@@ -65,6 +65,8 @@ include search.section.jade
 						span.tab-space
 						strong 
 							small{{file}}
+							button.btn.btn-xs.btn-default(ng-click='searchByFile(file);',title='Search for this file')
+								i.fa.fa-search
 						div(ng-show='showSource(hit.fields, file)')
 							div(hljs,source='fileSources[file]')
 						diff2html(revision='hit.fields.revision', file='file',ng-show='showDiff(hit.fields, file)',load-diff='{{showDiff(hit.fields, file)}}')

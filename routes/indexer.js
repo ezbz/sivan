@@ -4,7 +4,6 @@ var elasticsearch = require('../lib/elasticsearch');
 var diff2html = require('../lib/diff2html');
 var revisionUtils = require('../lib/revision-utils');
 var indexer = require('../lib/indexer');
-var maven = require('../lib/maven');
 var async = require('async');
 var moment = require('moment');
 var _ = require('underscore');

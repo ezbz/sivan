@@ -1,4 +1,4 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window) {
+angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, MavenClient, $http, $modal, $aside, $window, $location) {
 	$scope.query = "";
 	$scope.selections = {
 		modules: "",
@@ -88,12 +88,22 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		}
 	};
 
-
 	$scope.resetSearch = function() {
 		$scope.selections = _.clone($scope.defaultSelections);
 		$scope.pagination = _.clone($scope.defaultPagination);
 		$scope.search();
 	};
+
+
+	$scope.searchByFile = function(file) {
+		$scope.searchBy(file.substring(file.lastIndexOf('/')+1, file.length));
+	};
+
+	$scope.searchBy = function(text) {
+		$scope.query = text;
+		$scope.resetSearch();
+	};
+
 	$scope.initSelections = function(callback, errCallback) {
 		EsService.getSelections(function(selections, err) {
 			$scope.allAuthors = selections.allAuthors;
@@ -407,4 +417,9 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		$scope.search();
 	};
 
+
+	if($location.search().query){
+		$scope.query = $location.search().query;
+		$scope.search();
+	}
 });

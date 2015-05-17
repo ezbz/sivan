@@ -22,7 +22,6 @@ var subversion = require('./routes/subversion');
 var diff = require('./routes/diff');
 var indexer = require('./routes/indexer');
 var revisions = require('./routes/revisions');
-var maven = require('./routes/maven');
 var index = require('./routes/index');
 
 var app = express();
@@ -106,8 +105,6 @@ app.get('/svn/revision/sync', indexer.sync);
 app.get('/svn/revision/missing', indexer.missing);
 app.get('/svn/revision/missing/index', indexer.indexMissing);
 app.get('/svn/revision/:revision', indexer.fetchOrIndexRevision);
-app.get('/svn/revision/:revision/modules', revisions.revisionModules);
-app.get('/svn/revision/:revision/modules/dependants', revisions.revisionModulesDependants);
 app.get('/svn/revision/:revision/find', revisions.find);
 app.get('/svn/revision/:revision/index', indexer.index);
 app.post('/svn/diff/', diff.diffJsonPost);
@@ -116,13 +113,6 @@ app.get('/svn/diff/:revision', indexer.fetchOrIndexDiff);
 app.get('/svn/diff/:revision/html', diff.diffHtml);
 app.get('/svn/diffs/:revision', diff.diffsJson);
 app.get('/svn/diffs/:revision/html', diff.diffsHtml);
-app.get('/maven/dotfiles/generate', maven.generateDotFiles);
-app.get('/maven/dotfiles/list', maven.listDotFiles);
-app.get('/maven/dotfiles/:moduleId', maven.parseDotFile);
-app.get('/maven/module/:moduleId', maven.moduleTree);
-app.get('/maven/module/:moduleId/tree.json', maven.uiTree);
-app.get('/maven/module/:moduleId/html', maven.htmlTree);
-app.get('/maven/module/:moduleId/dependants', maven.dependants);
 
 var server = http.createServer(app);
 
