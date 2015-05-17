@@ -1,1 +1,0 @@
-for i in {19..200}; do curl http://localhost:3000/svn/revision/$((i*1000)):$((i*1000+1000))/index >> /Users/erez/temp/curlog ; done
