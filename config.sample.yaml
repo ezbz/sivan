@@ -1,0 +1,413 @@
+--- 
+app: 
+  port: 3001
+  rootUrl: 
+    prod: "http://yousite.com\\:3001/"
+    dev: "http://localhost\\:3001/"
+  esUrl: 
+    prod: "http://yousite.com:9200/"
+    dev: "http://localhost:9200/"
+logging: 
+  defaultLevel: TRACE
+repository: 
+  autoSync: false
+  autoSyncMinutes: 5
+  path: /Users/erez/dev/kafka/trunk
+svn: 
+  commandParallelism: 10
+  debug: false
+  url: "https://svn.apache.org/repos/asf/kafka/trunk/"
+  moduleMappings: 
+    contrib: 
+      type: index
+      segments: 2  
+  tagMappings: 
+    hashtag: 
+      regex: "(^|\W)(#[a-z\d][\w-]*)"
+      template: "<%=tag%>"
+    jira: 
+      regex: "KAFKA-\d+"
+      template: "Jira"
+time: 
+  defaultTimezone:"America/New_York"
+indexer: 
+  diffQueueSize: 5
+  indexQueueSize: 5
+  maxChunkSize: 20
+  reindexQueueSize: 100
+elasticsearch: 
+  indexName: 'svn-revision'
+  indexType: 'revision'
+  host: localhost
+  logLevel: warning
+  port: 9200
+  revision: 
+    mappings: 
+      body: 
+        revision: 
+          properties: 
+            author: 
+              index: not_analyzed
+              type: string
+            date: 
+              format: basic_date_time
+              type: date
+            modules: 
+              index: not_analyzed
+              type: string
+            revision: 
+              type: long
+            tags: 
+              index: not_analyzed
+              type: string
+    settings: 
+      body: 
+        settings: 
+          analysis: 
+            analyzer: 
+              path-analyzer: 
+                tokenizer: path-tokenizer
+                type: custom
+            tokenizer: 
+              path-tokenizer: 
+                delimiter: /
+                type: path_hierarchy
+          index: 
+            store: 
+              compress: 
+                stored: 1
+  filterAuthors: ""
+  logLevel: "warning"
+  requestTimeout: 15000
+  aggregationsQuery: 
+    size: 0
+    aggregations: 
+      authors: 
+        terms: 
+          field: "author"
+          size: 0
+      modules: 
+        terms: 
+          field: "modules"
+          size: 0
+      tags: 
+        terms: 
+          field: "tags"
+          size: 0
+      fileTypes: 
+        terms: 
+          field: "fileTypes"
+          size: 0
+  searchBaseQuery: 
+    body: 
+      fields: 
+        - "revision"
+        - "author"
+        - "date"
+        - "fileTypes"
+        - "files.status"
+        - "files.path"
+        - "message"
+        - "modules"
+        - "tags"
+        - "timestamp"
+      query: 
+        filtered: {}
+      aggregations: 
+        authors: 
+          terms: 
+            field: "author"
+            size: 5
+        modules: 
+          terms: 
+            field: "modules"
+            size: 5
+        tags: 
+          terms: 
+            field: "tags"
+            size: 5
+        fileTypes: 
+          terms: 
+            field: "fileTypes"
+            size: 5
+        significant_terms: 
+          significant_terms: 
+            field: "message"
+            size: 20
+        timeline: 
+          date_histogram: 
+            field: "date"
+            interval: "month"
+          aggregations: 
+            added: 
+              sum: 
+                field: "diff.addedLines"
+            deleted: 
+              sum: 
+                field: "diff.deletedLines"
+            authors: 
+              cardinality: 
+                field: "author"
+            modules: 
+              cardinality: 
+                field: "modules"
+knownFileTypes: 
+  - "actionscript"
+  - "apache"
+  - "applescript"
+  - "asciidoc"
+  - "aspectj"
+  - "autohotkey"
+  - "avrasm"
+  - "axapta"
+  - "bash"
+  - "brainfuck"
+  - "capnproto"
+  - "clojure"
+  - "cmake"
+  - "coffeescript"
+  - "cpp"
+  - "cs"
+  - "css"
+  - "d"
+  - "dart"
+  - "delphi"
+  - "diff"
+  - "django"
+  - "dockerfile"
+  - "dos"
+  - "dust"
+  - "elixir"
+  - "erb"
+  - "erlang"
+  - "fix"
+  - "fsharp"
+  - "gcode"
+  - "gherkin"
+  - "glsl"
+  - "go"
+  - "gradle"
+  - "groovy"
+  - "haml"
+  - "handlebars"
+  - "haskell"
+  - "haxe"
+  - "http"
+  - "ini"
+  - "java"
+  - "javascript"
+  - "json"
+  - "julia"
+  - "lasso"
+  - "less"
+  - "lisp"
+  - "livecodeserver"
+  - "livescript"
+  - "lua"
+  - "makefile"
+  - "markdown"
+  - "mathematica"
+  - "matlab"
+  - "mel"
+  - "mercury"
+  - "mizar"
+  - "monkey"
+  - "nginx"
+  - "nimrod"
+  - "nix"
+  - "nsis"
+  - "objectivec"
+  - "ocaml"
+  - "oxygene"
+  - "parser3"
+  - "perl"
+  - "pf"
+  - "php"
+  - "powershell"
+  - "processing"
+  - "profile"
+  - "properties"
+  - "protobuf"
+  - "puppet"
+  - "python"
+  - "q"
+  - "r"
+  - "rib"
+  - "roboconf"
+  - "rsl"
+  - "ruby"
+  - "ruleslanguage"
+  - "rust"
+  - "scala"
+  - "scheme"
+  - "scilab"
+  - "scss"
+  - "smali"
+  - "smalltalk"
+  - "sml"
+  - "sql"
+  - "stata"
+  - "step21"
+  - "stylus"
+  - "swift"
+  - "tcl"
+  - "tex"
+  - "thrift"
+  - "twig"
+  - "typescript"
+  - "vala"
+  - "vbnet"
+  - "vbscript"
+  - "verilog"
+  - "vhdl"
+  - "vim"
+  - "x86asm"
+  - "xl"
+  - "xml"
+  - "as"
+  - "apacheconf"
+  - "osascript"
+  - "adoc"
+  - "sh"
+  - "zsh"
+  - "bf"
+  - "capnp"
+  - "clj"
+  - "cmake.in"
+  - "coffee"
+  - "cson"
+  - "iced"
+  - "c"
+  - "h"
+  - "c++"
+  - "h++"
+  - "csharp"
+  - "patch"
+  - "jinja"
+  - "docker"
+  - "bat"
+  - "cmd"
+  - "dst"
+  - "erl"
+  - "fs"
+  - "nc"
+  - "feature"
+  - "golang"
+  - "hbs"
+  - "html.hbs"
+  - "html.handlebars"
+  - "hs"
+  - "hx"
+  - "jsp"
+  - "js"
+  - "ls"
+  - "lassoscript"
+  - "ls"
+  - "mk"
+  - "mak"
+  - "md"
+  - "mkdown"
+  - "mkd"
+  - "mma"
+  - "m"
+  - "moo"
+  - "nginxconf"
+  - "nixos"
+  - "m"
+  - "mm"
+  - "objc"
+  - "obj-c"
+  - "ml"
+  - "pl"
+  - "pf.conf"
+  - "php3"
+  - "php4"
+  - "php5"
+  - "php6"
+  - "ps"
+  - "pp"
+  - "py"
+  - "gyp"
+  - "k"
+  - "kdb"
+  - "graph"
+  - "instances"
+  - "rb"
+  - "gemspec"
+  - "podspec"
+  - "thor"
+  - "irb"
+  - "rs"
+  - "sci"
+  - "smali"
+  - "st"
+  - "ml"
+  - "do"
+  - "ado"
+  - "p21"
+  - "step"
+  - "stp"
+  - "styl"
+  - "tk"
+  - "craftcms"
+  - "ts"
+  - "vb"
+  - "vbs"
+  - "v"
+  - "tao"
+  - "html"
+  - "xhtml"
+  - "rss"
+  - "atom"
+  - "xsl"
+  - "plist"
+  - "yaml"
+themes:
+  - "arta"
+  - "ascetic"
+  - "atelier-dune"
+  - "atelier-dune"
+  - "atelier-forest"
+  - "atelier-forest"
+  - "atelier-heath"
+  - "atelier-heath"
+  - "atelier-lakeside"
+  - "atelier-lakeside"
+  - "atelier-seaside"
+  - "atelier-seaside"
+  - "brown_paper"
+  - "codepen-embed"
+  - "color-brewer"
+  - "dark"
+  - "default"
+  - "docco"
+  - "far"
+  - "foundation"
+  - "github"
+  - "googlecode"
+  - "hybrid"
+  - "idea"
+  - "ir_black"
+  - "kimbie"
+  - "kimbie"
+  - "magula"
+  - "mono-blue"
+  - "monokai"
+  - "monokai_sublime"
+  - "obsidian"
+  - "paraiso"
+  - "pojoaque"
+  - "railscasts"
+  - "rainbow"
+  - "school_book"
+  - "solarized_dark"
+  - "solarized_light"
+  - "sunburst"
+  - "tomorrow-night-blue"
+  - "tomorrow-night-bright"
+  - "tomorrow-night-eighties"
+  - "tomorrow-night"
+  - "tomorrow"
+  - "vs"
+  - "xcode"
+  - "zenburn"

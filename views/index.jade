@@ -41,6 +41,17 @@ html(ng-app='sivan')
     script(src='lib/diff2html/lib/jsdiff.min.js')  
     script(src='lib/diff2html/lib/promise.min.js')  
     script(src='lib/angular-jqcloud/angular-jqcloud.min.js')  
+    script.
+        var APP_CONFIG;
+        $.ajax({
+            url: '/config',
+            dataType: 'json',
+            async: false,
+            success: function(config){
+                //- console.log("Loaded application configuration: [%s]", JSON.stringify(config));
+                APP_CONFIG = config;
+            }
+        });
     script(src='app/dist/main.min.js')
   body
     div(ng-view)

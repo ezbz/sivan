@@ -2,3 +2,9 @@
 	a(href='',class='close', data-dismiss='alert') &times;
 	i.fa.fa-exclamation-triangle  Error executing query
 	json-formatter(json='error')
+.alert.alert-success(ng-show='message')
+	i.fa.fa-check  {{message}}
+.alert.alert-danger(ng-show='indexMissing')
+	a(href='',class='close', data-dismiss='alert') &times;
+	i.fa.fa-exclamation-triangle Index doesn't exist! 
+		button.btn.btn-warning(ng-click='createIndex()') Create the Index now

@@ -1,5 +1,5 @@
-angular.module('sivan').factory('SvnAdminClient', function($resource) {
-	return $resource(BASE_URL + 'svn/:action/:args', {
+angular.module('sivan').factory('SvnAdminClient', function($resource, AppConfig) {
+	return $resource(AppConfig.getBaseUrl() + 'svn/:action/:args', {
 		action: 'info',
 		args: ''
 	}, {

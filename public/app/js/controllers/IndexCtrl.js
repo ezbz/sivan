@@ -1,4 +1,4 @@
-angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsClient, $http, $modal, $aside, $window, $location) {
+angular.module('sivan').controller('IndexCtrl', function($scope, IndexAdminClient, EsService, EsClient, AppConfig, $http, $modal, $aside, $window, $location) {
 	$scope.query = "";
 	$scope.selections = {
 		modules: "",
@@ -23,6 +23,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	$scope.fileSources = {};
 	$scope.showFilters = false;
 	$scope.loading = false;
+	$scope.filteredAuthors = AppConfig.getAppConfig().elasticsearch.filteredAuthors;
 
 
 	$scope.highchartsNgConfig = {
@@ -96,7 +97,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 
 
 	$scope.searchByFile = function(file) {
-		$scope.searchBy(file.substring(file.lastIndexOf('/')+1, file.length));
+		$scope.searchBy(file.substring(file.lastIndexOf('/') + 1, file.length));
 	};
 
 	$scope.searchBy = function(text) {
@@ -105,7 +106,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 	};
 
 	$scope.initSelections = function(callback, errCallback) {
-		EsService.getSelections(function(selections, err) {
+		EsService.getSelections(function(selections) {
 			$scope.allAuthors = selections.allAuthors;
 			$scope.allModules = selections.allModules;
 			$scope.allTags = selections.allTags;
@@ -113,12 +114,13 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 			if (callback) {
 				callback(body);
 			}
-			if (err) {
-				console.log(err)
-				$scope.error = err;
-				if (errCallback) {
-					errCallback(err);
-				}
+		}, function(err) {
+			if (err && err.message.indexOf('IndexMissingException') !== -1) {
+				$scope.indexMissing = true;
+			}
+			$scope.error = err;
+			if (errCallback) {
+				errCallback(err);
 			}
 		});
 	};
@@ -312,7 +314,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		}
 		if (!$scope.fileSources[file]) {
 			$scope.loading = true;
-			var url = FLAT_URL + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
+			var url = AppConfig.getFlatUrl() + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
 			$http.get(url, {
 				cache: true
 			}).then(function(response) {
@@ -417,8 +419,21 @@ angular.module('sivan').controller('IndexCtrl', function($scope, EsService, EsCl
 		$scope.search();
 	};
 
+	$scope.bindHtml = function(html) {
+		return $sce.trustAsHtml(html);
+	}
+	$scope.createIndex = function() {
+		IndexAdminClient.create(function(response) {
+			$scope.message = "Index created";
+			$scope.error = false;
+			$scope.indexMissing = false;
+		}, function(err) {
+			$scope.error = err;
+		});
+	};
 
-	if($location.search().query){
+
+	if ($location.search().query) {
 		$scope.query = $location.search().query;
 		$scope.search();
 	}

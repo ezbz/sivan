@@ -32,11 +32,11 @@
 						ui-select-match(placeholder='Select a file type') {{$select.selected.key}}
 						ui-select-choices(repeat='fileType in allFileTypes | filter: $select.search ')
 							div(ng-bind-html='fileType.key | highlight: $select.search')
-				.col-lg-3
+				.col-lg-3(ng-show='filteredAuthors')
 					.input-group.checkbox
 						label(for="ciuser_checkbox")
 							input.checkbox(name='ciuser_checkbox',type='checkbox',ng-model="selections.filterAuthors", ng-change='search()')
-							span(style='margin-top:0px') &nbsp;Filter ciuser
+							span(style='margin-top:0px') &nbsp;Filter {{filteredAuthors}}
 			.form-group
 				.col-xs-3
 					.input-group.col-xs-12.pull-left

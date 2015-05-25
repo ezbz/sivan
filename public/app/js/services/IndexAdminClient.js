@@ -1,8 +1,16 @@
-angular.module('sivan').factory('IndexAdminClient', function($resource) {
-	return $resource(BASE_URL + 'svn/revision/:revision/:action', {
+angular.module('sivan').factory('IndexAdminClient', function($resource, AppConfig) {
+	return $resource(AppConfig.getBaseUrl() + 'svn/revision/:revision/:action', {
 		action: 'info',
 		args: ''
 	}, {
+		create: {
+			method: 'GET',
+			isArray: true,
+			params: {
+				revision: 'index',
+				action: 'create'
+			}
+		},
 		index: {
 			method: 'GET',
 			isArray: true,

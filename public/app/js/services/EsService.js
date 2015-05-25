@@ -1,22 +1,27 @@
 angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
   return {
-    getSelections: function(callback) {
+    getSelections: function(callback, errCallback) {
       EsClient.search({
-        index: 'svn-revision',
-        type: 'revision',
+        index: AppConfig.getAppConfig().elasticsearch.indexName,
+        type: AppConfig.getAppConfig().elasticsearch.indexType,
         body: AppConfig.getAppConfig().elasticsearch.aggregationsQuery
-      }).then(function(body, err) {
+      }).then(function(body) {
         callback({
           allAuthors: _.sortBy(body.aggregations.authors.buckets, 'key'),
           allModules: _.sortBy(body.aggregations.modules.buckets, 'key'),
           allTags: _.sortBy(body.aggregations.tags.buckets, 'key'),
           allFileTypes: _.sortBy(body.aggregations.fileTypes.buckets, 'key')
-        }, err);
+        });
+      }, function(err) {
+        console.log(err);
+        errCallback(err);
       });
     },
     search: function(params, callback, errCallback) {
       var config = AppConfig.getAppConfig().elasticsearch;
       var searchObj = $.extend(true, {}, config.searchBaseQuery);
+      searchObj.index = AppConfig.getAppConfig().elasticsearch.indexName;
+      searchObj.type = AppConfig.getAppConfig().elasticsearch.indexType;
       searchObj.body.from = (params.pagination.pageSize * (params.pagination.pageNumber - 1));
       searchObj.body.size = params.pagination.pageSize;
 

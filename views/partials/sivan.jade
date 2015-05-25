@@ -48,7 +48,7 @@ include search.section.jade
 					//button.btn.btn-xs.btn-warning(ng-disabled='loading',ng-click='showDeepTree(hit.fields.revision, hit.fields.modules)',ng-show='hasModuleTree(hit.fields.modules)',title='show dependencies (experimental)')
 						i.fa.fa-tree
 					span &nbsp; {{hit.fields.modules.join(', ')}}
-				td {{hit.fields.tags.join(', ')}}
+				td(ng-bind-html="hit.fields.tags.join(', ')  | html")
 				td {{hit.fields.fileTypes.join(', ')}}
 				td {{hit.fields.message.join(', ')}}
 			tr(ng-show='showFiles(hit.fields)')

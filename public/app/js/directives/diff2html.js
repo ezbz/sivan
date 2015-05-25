@@ -1,11 +1,11 @@
-angular.module('sivan').directive('diff2html', function($http, $parse) {
+angular.module('sivan').directive('diff2html', function($http, $parse, AppConfig) {
 	return {
 		restrict: 'E',
 		link: function(scope, element, attributes) {
 			attributes.$observe('loadDiff', function(loadFlag) {
 				var revisionAttr = $parse(attributes.revision)(scope);
 				if (revisionAttr != 'undefined' && loadFlag === 'true') {
-					$http.get(FLAT_URL + "svn/diff/" + revisionAttr, {
+					$http.get(AppConfig.getFlatUrl() + "svn/diff/" + revisionAttr, {
 						cache: true
 					}).then(function(response) {
 						var html = '';

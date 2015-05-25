@@ -11,8 +11,8 @@ var esClient = new elasticsearch();
 
 exports.find = function(req, res) {
   esClient.get({
-    index: 'svn-revision',
-    type: 'revision',
+    index: config.elasticsearch.indexName,
+    type: config.elasticsearch.indexType,
     data: revisionUtils.denormalizeRevision(req.params.revision)
   }, function(err, json) {
     res.json(json);
@@ -21,9 +21,15 @@ exports.find = function(req, res) {
 
 exports.maxId = function(req, res) {
   esClient.maxId({
-    index: 'svn-revision',
-    type: 'revision'
+    index: config.elasticsearch.indexName,
+    type: config.elasticsearch.indexType
   }, function(err, results) {
-    res.json({maxId: parseInt(results.hits.hits[0]._id)});
+    var maxId = 0;
+    if (results.hits && results.hits.hits[0]) {
+      maxId = parseInt(results.hits.hits[0]._id);
+    }
+    res.json({
+      maxId: maxId
+    });
   })
 }
