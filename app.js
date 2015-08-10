@@ -19,9 +19,9 @@ var nib = require('nib');
 var scheduler = require('./lib/scheduler');
 var appConfig = require('./config');
 var subversion = require('./routes/subversion');
-var diff = require('./routes/diff');
+var git = require('./routes/git');
+var scm = require('./routes/scm');
 var indexer = require('./routes/indexer');
-var revisions = require('./routes/revisions');
 var index = require('./routes/index');
 
 var app = express();
@@ -92,27 +92,56 @@ app.get('/', index.home);
 app.get('/config', function(req, res) {
   res.json(appConfig)
 });
+app.get('/revision/max', indexer.maxId);
+app.get('/revision/index/create', indexer.createIndex);
+app.get('/revision/sync', indexer.sync);
+app.get('/revision/:revision/find', indexer.find);
+app.get('/revision/:revision/index', indexer.index);
+
 app.get('/svn/status', subversion.status);
 app.get('/svn/update', subversion.update);
 app.get('/svn/cleanup', subversion.cleanup);
 app.get('/svn/info', subversion.info);
+app.get('/svn/log/:revision', subversion.log);
 app.get('/svn/file/:file', subversion.file);
 app.get('/svn/file/:file/:revision', subversion.revisionFile);
 app.get('/svn/info/server', subversion.serverInfo);
-app.get('/svn/revision/max', revisions.maxId);
-app.get('/svn/revision/index/create', indexer.createIndex);
-app.get('/svn/revision/sync', indexer.sync);
 app.get('/svn/revision/missing', indexer.missing);
 app.get('/svn/revision/missing/index', indexer.indexMissing);
 app.get('/svn/revision/:revision', indexer.fetchOrIndexRevision);
-app.get('/svn/revision/:revision/find', revisions.find);
-app.get('/svn/revision/:revision/index', indexer.index);
-app.post('/svn/diff/', diff.diffJsonPost);
-app.post('/svn/diff/html', diff.diffHtmlPost);
+app.post('/svn/diff/', subversion.diffJsonPost);
+app.post('/svn/diff/html', subversion.diffHtmlPost);
 app.get('/svn/diff/:revision', indexer.fetchOrIndexDiff);
-app.get('/svn/diff/:revision/html', diff.diffHtml);
-app.get('/svn/diffs/:revision', diff.diffsJson);
-app.get('/svn/diffs/:revision/html', diff.diffsHtml);
+app.get('/svn/diff/:revision/html', subversion.diffHtml);
+app.get('/svn/diff/:revision/text', subversion.diffText);
+app.get('/svn/diffs/:revision', subversion.diffsJson);
+app.get('/svn/diffs/:revision/html', subversion.diffsHtml);
+
+
+app.get('/git/status', git.status);
+app.get('/git/update', git.update);
+app.get('/git/cleanup', git.cleanup);
+app.get('/git/info', git.info);
+app.get('/git/file/:file', git.file);
+app.get('/git/file/:file/:revision', git.revisionFile);
+app.get('/git/log/:revision', git.log);
+app.get('/git/diff/:revision', git.diffJson);
+app.get('/git/diff/:revision/text', git.diffText);
+app.get('/git/diff/:revision/html', git.diffHtml);
+
+
+app.get('/scm/status', scm.status);
+app.get('/scm/update', scm.update);
+app.get('/scm/cleanup', scm.cleanup);
+app.get('/scm/info', scm.info);
+app.get('/scm/info/server', scm.serverInfo);
+app.get('/scm/file/:file', scm.file);
+app.get('/scm/file/:file/:revision', scm.revisionFile);
+app.get('/scm/log/:revision', scm.log);
+app.get('/scm/diff/:revision', scm.diffJson);
+app.get('/scm/diff/:revision/text', scm.diffText);
+app.get('/scm/diff/:revision/html', scm.diffHtml);
+
 
 var server = http.createServer(app);
 
@@ -120,14 +149,17 @@ var iosServer = io.listen(server.listen(app.get('port'), function() {
   logger.info('Express server listening on port ' + app.get('port'));
 }));
 
-var schedule = new scheduler();
-schedule.scheduleSync(function(err, results) {
-  if (err && err.length > 0) {
-    logger.error("Error scheduled sync [%s]", JSON.stringify(err));
-  } else {
-    logger.info("Finished scheduled sync");
-  }
-});
+if(appConfig.repository.autoSync){
+  logger.info("Starting auto sync scheduler")
+  var schedule = new scheduler();
+  schedule.scheduleSync(function(err, results) {
+    if (err && err.length > 0) {
+      logger.error("Error scheduled sync [%s]", JSON.stringify(err));
+    } else {
+      logger.info("Finished scheduled sync");
+    }
+  });
+}
 
 iosServer.set('log level', 1); // set level to warn 
 iosServer.sockets.on('connection', function(socket) {

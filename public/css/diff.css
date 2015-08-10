@@ -1,3 +1,7 @@
+body {
+  text-align: center;
+  font-family: 'Source Sans Pro', sans-serif;
+}
 .d2h-wrapper {
   display: block;
   margin: 0 auto;

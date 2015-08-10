@@ -314,7 +314,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, IndexAdminClien
 		}
 		if (!$scope.fileSources[file]) {
 			$scope.loading = true;
-			var url = AppConfig.getFlatUrl() + "svn/file/" + encodeURIComponent(file) + "/" + revision.revision;
+			var url = AppConfig.getFlatUrl() + "scm/file/" + encodeURIComponent(file) + "/" + revision.revision;
 			$http.get(url, {
 				cache: true
 			}).then(function(response) {

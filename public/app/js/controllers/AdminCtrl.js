@@ -1,4 +1,4 @@
-angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient, IndexAdminClient, AppConfig, $cookies) {
+angular.module('sivan').controller('AdminCtrl', function($scope, ScmAdminClient, IndexAdminClient, AppConfig, $cookies) {
 	$scope.sourceTheme = $cookies.sourceTheme ? $cookies.sourceTheme : "monokai";
 	$scope.themes = AppConfig.getAppConfig().themes;
 
@@ -11,9 +11,9 @@ angular.module('sivan').controller('AdminCtrl', function($scope, SvnAdminClient,
 	$scope.fetchRevisions = function(callback) {
 		IndexAdminClient.maxId(function(maxIdResponse) {
 			$scope.maxIndexedRevision = maxIdResponse.maxId;
-			SvnAdminClient.info(function(infoResponse) {
+			ScmAdminClient.info(function(infoResponse) {
 					$scope.revision = infoResponse.revision;
-					SvnAdminClient.serverInfo(function(serverResponse) {
+					ScmAdminClient.serverInfo(function(serverResponse) {
 						if (serverResponse.revision) {
 							$scope.serverRevision = serverResponse.revision;
 							$scope.status = 'ok';

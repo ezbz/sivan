@@ -1,5 +1,5 @@
 angular.module('sivan').factory('IndexAdminClient', function($resource, AppConfig) {
-	return $resource(AppConfig.getBaseUrl() + 'svn/revision/:revision/:action', {
+	return $resource(AppConfig.getBaseUrl() + 'revision/:revision/:action', {
 		action: 'info',
 		args: ''
 	}, {
