@@ -80,24 +80,37 @@ angular.module('sivan').factory('EsService', function(EsClient, AppConfig) {
           }
         });
       }
-      if (params.selections.startRevision) {
+
+      if (params.selections.startRevision && params.selections.endRevision) {
         andFilterItems.push({
           range: {
             revision: {
-              gte: parseInt(params.selections.startRevision)
-            }
-          }
-        });
-      }
-      if (params.selections.endRevision) {
-        andFilterItems.push({
-          range: {
-            revision: {
+              gte: parseInt(params.selections.startRevision),
               lte: parseInt(params.selections.endRevision)
             }
           }
         });
+      } else {
+        if (params.selections.startRevision) {
+          andFilterItems.push({
+            range: {
+              revision: {
+                gte: parseInt(params.selections.startRevision)
+              }
+            }
+          });
+        }
+        if (params.selections.endRevision) {
+          andFilterItems.push({
+            range: {
+              revision: {
+                lte: parseInt(params.selections.endRevision)
+              }
+            }
+          });
+        }
       }
+
       var hasStart = false,
         hasEnd = false;
       if (params.selections.startDate ||
