@@ -117,7 +117,6 @@ app.get('/svn/diff/:revision/text', subversion.diffText);
 app.get('/svn/diffs/:revision', subversion.diffsJson);
 app.get('/svn/diffs/:revision/html', subversion.diffsHtml);
 
-
 app.get('/git/status', git.status);
 app.get('/git/update', git.update);
 app.get('/git/cleanup', git.cleanup);
@@ -128,7 +127,6 @@ app.get('/git/log/:revision', git.log);
 app.get('/git/diff/:revision', git.diffJson);
 app.get('/git/diff/:revision/text', git.diffText);
 app.get('/git/diff/:revision/html', git.diffHtml);
-
 
 app.get('/scm/status', scm.status);
 app.get('/scm/update', scm.update);
@@ -141,7 +139,6 @@ app.get('/scm/log/:revision', scm.log);
 app.get('/scm/diff/:revision', scm.diffJson);
 app.get('/scm/diff/:revision/text', scm.diffText);
 app.get('/scm/diff/:revision/html', scm.diffHtml);
-
 
 var server = http.createServer(app);
 

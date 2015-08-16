@@ -16,6 +16,7 @@ include search.section.jade
 				i.fa.fa-chevron-right
 	.col-sm-10
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')
+		select.pull-right(ng-model="pagination.pageSize", ng-options="item for item in pageSizes",ng-change='search()')
 
 .container-fluid(ng-show='result.total > 0')
 	table.table.table-fixed.table-condensed.table-striped
@@ -73,4 +74,5 @@ include search.section.jade
 .container-fluid(ng-show='result.total > 0')
 	.col-xs-12
 		pagination.pull-right(boundary-links="true",total-items='pagination.totalItems',max-size='{{pagination.maxPages}}',items-per-page='{{pagination.pageSize}}',ng-model='pagination.pageNumber',ng-change='search()')
+		select.pull-right(ng-model="pagination.pageSize", ng-options="item for item in pageSizes",ng-change='search()')
 

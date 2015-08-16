@@ -16,6 +16,7 @@ angular.module('sivan').controller('IndexCtrl', function($scope, IndexAdminClien
 		sortBy: 'revision',
 		sortDirection: 'desc'
 	};
+	$scope.pageSizes = [10, 25, 50, 100]
 	$scope.defaultPagination = _.clone($scope.pagination);
 	$scope.showFiles = {};
 	$scope.showDiffs = {};
