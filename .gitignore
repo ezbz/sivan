@@ -8,3 +8,4 @@ dump.rdb
 github-token
 dump
 config.yaml
+config.*.yaml
