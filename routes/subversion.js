@@ -42,8 +42,7 @@ exports.revisionFile = function(req, res) {
   }
   var revision = req.params.revision;
   svnClient.cat({
-    path: config.repository.path + file,
-    revision: revision
+    revisionPath: config.svn.url + file + '@' + revision
   }, function(err, data) {
     if (err) {
       res.status(500).send(err);
