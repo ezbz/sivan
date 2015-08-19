@@ -57,9 +57,9 @@ include search.section.jade
 					div(ng-repeat='file in hit.fields["files.path"] track by $index') 
 						span.tab-space
 						small
-							button.btn.btn-xs.btn-primary(ng-show='file',ng-disabled='loading || hit.fields["files.status"][$index] == "D"',ng-click='toggleSource(hit.fields, file)', title='source')
+							button.btn.btn-xs.btn-primary(ng-show='file',ng-disabled='loading || isDirectory(file) || hit.fields["files.status"][$index] == "D"',ng-click='toggleSource(hit.fields, file)', title='source')
 								i.fa.fa-code
-							button.btn.btn-xs.btn-success(ng-show='file',ng-disabled='loading',ng-click='toggleDiff(hit.fields, file)', title='diff')
+							button.btn.btn-xs.btn-success(ng-show='file',ng-disabled='loading || isDirectory(file)',ng-click='toggleDiff(hit.fields, file)', title='diff')
 								i.fa.fa-list-ol
 						span.tab-space
 						span.label(ng-class='{"M": "label-warning", "D":"label-danger", "A":"label-primary"}[hit.fields["files.status"][$index]]'){{hit.fields["files.status"][$index]}}

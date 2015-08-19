@@ -420,6 +420,9 @@ angular.module('sivan').controller('IndexCtrl', function($scope, IndexAdminClien
 		$scope.search();
 	};
 
+	$scope.isDirectory = function(file) {
+		return file.indexOf('.') == -1;
+	}
 	$scope.bindHtml = function(html) {
 		return $sce.trustAsHtml(html);
 	}
